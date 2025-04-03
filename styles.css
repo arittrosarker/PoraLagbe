@@ -153,10 +153,13 @@ table {
   border-collapse: collapse;
   margin-bottom: 20px;
 }
-table, th, td {
+table,
+th,
+td {
   border: 1px solid #003f63;
 }
-th, td {
+th,
+td {
   padding: 10px;
   text-align: center;
 }
@@ -222,7 +225,8 @@ footer {
     flex-direction: column;
     align-items: center;
   }
-  .left-section, .right-section {
+  .left-section,
+  .right-section {
     flex: 1 0 90%;
   }
 }
@@ -238,7 +242,8 @@ footer {
     padding: 10px;
   }
   /* Center all text for mobile */
-  .left-section, .right-section {
+  .left-section,
+  .right-section {
     text-align: center;
   }
 }
