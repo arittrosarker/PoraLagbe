@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Study Timer & Leaderboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- We use module script so our app.js can use ES6 imports -->
+    <script type="module" src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header with User Name and Custom Status -->
+      <header>
+        <h1>Study Timer & Leaderboard</h1>
+        <div class="user-settings">
+          <input type="text" id="usernameInput" placeholder="Enter your name" />
+          <button id="saveUsernameBtn">Save Name</button>
+          <input type="text" id="customStatus" placeholder="Set custom status message" />
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main>
+        <!-- Timer section -->
+        <section class="timer-section">
+          <!-- Animated Clock Display -->
+          <div class="animated-clock" id="animatedClock"></div>
+          <!-- Status Indicator -->
+          <div class="status-indicator" id="statusIndicator">Idle</div>
+          <!-- Study Timer Display (center of page) -->
+          <div class="study-timer" id="studyTimer">00:00:00</div>
+          <div class="timer-controls">
+            <button id="startBtn">Start</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+          </div>
+          <!-- Audio elements for feedback (provide your own mp3 files) -->
+          <audio id="startSound" src="start.mp3"></audio>
+          <audio id="pauseSound" src="pause.mp3"></audio>
+          <!-- Study Goals & Progress Bar -->
+          <div class="study-goal">
+            <input type="number" id="studyGoalInput" placeholder="Set Daily Study Goal (hrs)" />
+            <button id="setGoalBtn">Set Goal</button>
+            <div class="progress-bar">
+              <div id="goalProgress"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Additional info: Motivational Quote, Daily Streak, Lifetime Study Time -->
+        <section class="additional-info">
+          <div class="motivational-quote" id="motivationalQuote"></div>
+          <div class="daily-streak">
+            Streak: <span id="streakCounter">0</span> days
+          </div>
+          <div class="lifetime-study">
+            Lifetime Study: <span id="lifetimeTime">0</span> hrs
+          </div>
+        </section>
+
+        <!-- Session Log -->
+        <section class="session-log">
+          <h2>Session Log</h2>
+          <table id="sessionTable">
+            <thead>
+              <tr>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section class="leaderboard-section">
+          <h2>Leaderboard</h2>
+          <table id="leaderboardTable">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Study Time (hrs)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <!-- Date Icon / Button to view previous day's data -->
+          <div class="previous-day">
+            <button id="prevDayBtn">View Previous Day's Data</button>
+            <div id="prevDayData"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
