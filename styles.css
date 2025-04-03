@@ -70,7 +70,7 @@ header h1 {
 }
 .study-timer {
   font-size: 4em;
-  font-weight: 700;
+  font-weight: bold;
   margin: 20px 0;
 }
 .timer-controls button {

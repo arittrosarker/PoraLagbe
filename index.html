@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Study Timer & Leaderboard</title>
-    <!-- Google Fonts for a sleek UI -->
+    <!-- Google Fonts for modern styling -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
       rel="stylesheet"
@@ -40,11 +40,10 @@
           <!-- Study Timer Display -->
           <div class="study-timer" id="studyTimer">00:00:00</div>
           <div class="timer-controls">
-            <button id="startBtn">Start</button>
-            <button id="pauseBtn">Pause</button>
-            <button id="resetBtn">Reset</button>
+            <!-- Single toggle button for Start/Pause -->
+            <button id="toggleTimer">Start</button>
           </div>
-          <!-- Audio Elements (ensure you add your own audio files) -->
+          <!-- Audio Elements (ensure these files exist) -->
           <audio id="startSound" src="start.mp3"></audio>
           <audio id="pauseSound" src="pause.mp3"></audio>
           <!-- Study Goal & Progress -->
@@ -94,7 +93,7 @@
             <thead>
               <tr>
                 <th>User</th>
-                <th>Study Time (hrs)</th>
+                <th>Study Time</th>
               </tr>
             </thead>
             <tbody></tbody>
