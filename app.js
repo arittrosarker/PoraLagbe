@@ -83,9 +83,10 @@ fetch("badword.txt")
 
 // Check if the name contains any banned word (case-insensitive substring check)
 function containsBannedWord(name) {
-  const lowerName = name.toLowerCase();
-  return bannedWords.some((word) => lowerName.includes(word));
+  const lowerNameWords = name.toLowerCase().split(/\s+/); // Split username into words
+  return lowerNameWords.some((word) => bannedWords.includes(word));
 }
+
 
 // Animated clock display
 function updateClock() {
