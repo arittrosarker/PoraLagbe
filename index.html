@@ -26,7 +26,9 @@
         <!-- When the name is set, display user's name and the Delete Account button -->
         <div id="userDisplay" style="display:none;">
           Hello, <span id="displayedUsername"></span>
-          <button id="deleteAccountBtn" class="delete-btn">Delete Account</button>
+          <button id="deleteAccountBtn" class="delete-btn">
+            Delete Account
+          </button>
         </div>
       </header>
 
@@ -39,8 +41,12 @@
               <!-- Timer Section -->
               <section class="timer-section">
                 <div class="animated-clock" id="animatedClock"></div>
-                <div class="status-indicator" id="statusIndicator">Idle</div>
-                <div class="study-timer" id="studyTimer">00:00:00</div>
+                <div class="status-indicator" id="statusIndicator">
+                  Idle
+                </div>
+                <div class="study-timer" id="studyTimer">
+                  00:00:00
+                </div>
                 <div class="timer-controls">
                   <!-- Single toggle button for Start/Pause -->
                   <button id="toggleTimer">Start</button>
@@ -61,7 +67,9 @@
               <!-- Session Log (local for today) -->
               <section class="session-log">
                 <h2>Session Log</h2>
-                <p class="tip">*Only sessions longer than 5 minutes will be saved.*</p>
+                <p class="tip">
+                  *Only sessions longer than 5 minutes will be saved.*
+                </p>
                 <table id="sessionTable">
                   <thead>
                     <tr>
@@ -90,7 +98,9 @@
                   <tbody></tbody>
                 </table>
                 <div class="previous-day">
-                  <button id="prevDayBtn">View Previous Day's Data</button>
+                  <button id="prevDayBtn">
+                    View Previous Day's Data
+                  </button>
                   <div id="prevDayData"></div>
                 </div>
               </section>
