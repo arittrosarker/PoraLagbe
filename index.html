@@ -23,9 +23,10 @@
           <input type="text" id="usernameInput" placeholder="Enter your name" />
           <button id="saveUsernameBtn">Save Name</button>
         </div>
-        <!-- Once the user sets a name, this is shown -->
+        <!-- When the name is set, display user's name and the Delete Account button -->
         <div id="userDisplay" style="display:none;">
           Hello, <span id="displayedUsername"></span>
+          <button id="deleteAccountBtn" class="delete-btn">Delete Account</button>
         </div>
       </header>
 
@@ -44,7 +45,7 @@
                   <!-- Single toggle button for Start/Pause -->
                   <button id="toggleTimer">Start</button>
                 </div>
-                <!-- Audio elements (ensure these files are provided) -->
+                <!-- Audio elements (ensure these files are present in your project) -->
                 <audio id="startSound" src="start.mp3"></audio>
                 <audio id="pauseSound" src="pause.mp3"></audio>
               </section>
