@@ -82,7 +82,7 @@ fetch("badword.txt")
 
 // Check if the name contains any banned word (using whole-word matching)
 function containsBannedWord(name) {
-  const lowerNameWords = name.toLowerCase().split(/\s+/); // split by whitespace
+  const lowerNameWords = name.toLowerCase().split(/\s+/);
   return lowerNameWords.some((word) => bannedWords.includes(word));
 }
 
@@ -140,7 +140,6 @@ function loadLocalSessionLog() {
   const key = getSessionKey();
   sessionTableBody.innerHTML = "";
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
-  // Filter out sessions shorter than 5 minutes.
   sessions = sessions.filter((session) => session.duration >= 300);
   localStorage.setItem(key, JSON.stringify(sessions));
   sessions.forEach((session) => {
@@ -152,7 +151,7 @@ function loadLocalSessionLog() {
   });
 }
 
-// Check for new day; reset local data if so.
+// Check for new day; reset local data if needed.
 function checkDailyReset() {
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem("studyDate");
@@ -233,7 +232,7 @@ function updateLeaderboard(user, timeSec) {
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Load realtime leaderboard from Firebase and update the table.
+// Load realtime leaderboard from Firebase.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
@@ -274,46 +273,41 @@ function increaseStreak() {
   }
 }
 
-// Delete Account function – clears Firebase data (leaderboard), local storage, cookies, caches, and resets UI.
+// Delete Account function – clears Firebase data (leaderboard) and local storage without requiring a refresh.
 function deleteAccount() {
   if (
     confirm(
-      "Are you sure you want to delete your account? This will remove all your data and reset the app."
+      "Are you sure you want to delete your account? This will remove your data and reset the app."
     )
   ) {
-    // Stop any active intervals
+    // Stop active intervals
     clearInterval(timerInterval);
     clearInterval(firebaseUpdateInterval);
     firebaseUpdateInterval = null;
-
     // Remove user's leaderboard entry from Firebase.
     const leaderboardRef = ref(db, "leaderboard/" + username);
     remove(leaderboardRef)
       .then(() => {
         console.log("Firebase leaderboard entry removed.");
-        // Wait briefly to ensure removal is propagated
-        setTimeout(() => {
-          localStorage.clear();
-          sessionStorage.clear();
-
-          // Clear cookies.
-          document.cookie.split(";").forEach(function (c) {
-            document.cookie = c
-              .replace(/^ +/, "")
-              .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
-          });
-
-          // Clear cache storage if available.
-          if ("caches" in window) {
-            caches.keys().then((names) => {
-              names.forEach((name) => {
-                caches.delete(name);
-              });
+        // Clear local and session storage, cookies, and caches
+        localStorage.clear();
+        sessionStorage.clear();
+        document.cookie.split(";").forEach(function (c) {
+          document.cookie =
+            c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+        });
+        if ("caches" in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => {
+              caches.delete(name);
             });
-          }
-
-          location.reload();
-        }, 500);
+          });
+        }
+        // Instead of reloading the page, simply update the UI:
+        username = "";
+        userSetupDiv.style.display = "block";
+        userDisplayDiv.style.display = "none";
+        appContent.style.display = "none";
       })
       .catch((error) => {
         console.error("Error removing leaderboard entry:", error);
@@ -323,7 +317,6 @@ function deleteAccount() {
 
 // === Event Listeners ===
 
-// Toggle Timer Start/Pause
 toggleTimerBtn.addEventListener("click", () => {
   if (!username) {
     alert("Please set your name first.");
@@ -337,19 +330,16 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
-// Save Username with duplicate and banned word checks
 saveUsernameBtn.addEventListener("click", () => {
   const inputName = usernameInput.value.trim();
   if (!inputName) {
     alert("Please enter a valid name.");
     return;
   }
-  // Check for banned words
   if (containsBannedWord(inputName)) {
     alert("This name is not allowed.");
     return;
   }
-  // Lowercase comparison for duplicates in the Firebase "leaderboard" node
   const lowerInput = inputName.toLowerCase();
   const leaderboardRef = ref(db, "leaderboard");
   get(leaderboardRef)
@@ -370,12 +360,10 @@ saveUsernameBtn.addEventListener("click", () => {
       } else {
         username = inputName;
         localStorage.setItem("studyUsername", username);
-        // Immediately add the username to the leaderboard with 0 seconds
+        // Immediately add the username to the leaderboard with 0 seconds.
         updateLeaderboard(username, 0);
-        // Set an onDisconnect handler so the node is removed when the client disconnects
-        const userRef = ref(db, "leaderboard/" + username);
-        userRef.onDisconnect().remove();
-
+        // Remove the onDisconnect handler to avoid forcing a refresh.
+        // (Previously: userRef.onDisconnect().remove(); was removed.)
         userSetupDiv.style.display = "none";
         displayedUsernameEl.innerText = username;
         userDisplayDiv.style.display = "block";
