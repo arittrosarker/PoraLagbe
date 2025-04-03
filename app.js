@@ -8,7 +8,7 @@ import {
   push,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Firebase configuration (as provided)
+// Firebase configuration (replace with your settings)
 const firebaseConfig = {
   apiKey: "AIzaSyAx3b-2EPm2qPjYu6L07GCCKAkoF_z1sF0",
   authDomain: "poralagbe-17c0e.firebaseapp.com",
@@ -26,35 +26,36 @@ const db = getDatabase(app);
 let timerInterval = null;
 let firebaseUpdateInterval = null;
 let startTime = null;
-let elapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0; // in seconds
+let elapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0; // seconds
 let isRunning = false;
-let username = localStorage.getItem("studyUsername") || "";
 let currentSession = null;
-let dailyGoal = 0; // in hours
+
+// Require a name before allowing app usage.
+let username = localStorage.getItem("studyUsername") || "";
 
 // HTML Elements
 const studyTimerEl = document.getElementById("studyTimer");
 const toggleTimerBtn = document.getElementById("toggleTimer");
 const usernameInput = document.getElementById("usernameInput");
 const saveUsernameBtn = document.getElementById("saveUsernameBtn");
+const userSetupDiv = document.getElementById("userSetup");
+const userDisplayDiv = document.getElementById("userDisplay");
+const displayedUsernameEl = document.getElementById("displayedUsername");
 const statusIndicator = document.getElementById("statusIndicator");
 const motivationalQuoteEl = document.getElementById("motivationalQuote");
 const streakCounterEl = document.getElementById("streakCounter");
-const lifetimeTimeEl = document.getElementById("lifetimeTime");
 const sessionTableBody = document.querySelector("#sessionTable tbody");
 const leaderboardTableBody = document.querySelector("#leaderboardTable tbody");
 const animatedClockEl = document.getElementById("animatedClock");
-const studyGoalInput = document.getElementById("studyGoalInput");
-const setGoalBtn = document.getElementById("setGoalBtn");
-const goalProgressEl = document.getElementById("goalProgress");
 const prevDayBtn = document.getElementById("prevDayBtn");
 const prevDayDataEl = document.getElementById("prevDayData");
+const appContent = document.getElementById("appContent");
 
-// Audio elements
+// Audio Elements (ensure these assets exist)
 const startSound = document.getElementById("startSound");
 const pauseSound = document.getElementById("pauseSound");
 
-// Motivational quotes
+// Motivational Quotes
 const quotes = [
   "Keep pushing your limits!",
   "Small steps every day.",
@@ -68,7 +69,7 @@ function displayRandomQuote() {
   motivationalQuoteEl.innerText = quotes[randomIndex];
 }
 
-// Animated Clock
+// Animated clock display
 function updateClock() {
   const now = new Date();
   animatedClockEl.innerText = now.toLocaleTimeString();
@@ -80,7 +81,7 @@ updateClock();
 function formatTime(seconds) {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const secs = seconds % 3600 % 60;
   return (
     String(hrs).padStart(2, "0") +
     ":" +
@@ -90,7 +91,7 @@ function formatTime(seconds) {
   );
 }
 
-// Format time for Leaderboard as "Xh Ym"
+// Format leaderboard time as "Xh Ym"
 function formatLeaderboardTime(seconds) {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -99,35 +100,29 @@ function formatLeaderboardTime(seconds) {
 
 function updateTimerDisplay() {
   studyTimerEl.innerText = formatTime(elapsedTime);
-  // Update progress bar for daily goal
-  if (dailyGoal > 0) {
-    const progressPercent = Math.min(
-      (elapsedTime / (dailyGoal * 3600)) * 100,
-      100
-    );
-    goalProgressEl.style.width = progressPercent + "%";
-  }
   localStorage.setItem("elapsedTime", elapsedTime);
 }
 
-// Check if it's a new day – reset daily data if needed.
+// Check if it's a new day; reset local data if needed.
 function checkDailyReset() {
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem("studyDate");
   if (storedDate !== todayStr) {
-    // Save previous day's leaderboard data (stub)
-    savePreviousDayData(storedDate);
+    savePreviousDayData(storedDate); // (stub for leaderboard history)
     elapsedTime = 0;
     localStorage.setItem("studyDate", todayStr);
     localStorage.removeItem("hasStudiedToday");
     localStorage.setItem("streak", 0);
     streakCounterEl.innerText = 0;
+    // Clear today's session log
+    localStorage.removeItem(getSessionKey());
     updateTimerDisplay();
     updateStatus("Idle");
+    loadLocalSessionLog();
   }
 }
 
-// Save previous day data (stub)
+// Save previous day's leaderboard data (stub)
 function savePreviousDayData(dateStr) {
   if (!dateStr) return;
   const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
@@ -135,7 +130,35 @@ function savePreviousDayData(dateStr) {
   set(leaderboardRef, leaderboardData);
 }
 
-// Timer functions: start and pause
+// Returns the localStorage key for today's session log.
+function getSessionKey() {
+  return "sessionLog_" + new Date().toDateString();
+}
+
+// Local Session Log: add a session and reload log.
+function addLocalSessionLog(session) {
+  const key = getSessionKey();
+  let sessions = JSON.parse(localStorage.getItem(key)) || [];
+  sessions.push(session);
+  localStorage.setItem(key, JSON.stringify(sessions));
+  loadLocalSessionLog();
+}
+
+// Load the local session log and update the table.
+function loadLocalSessionLog() {
+  const key = getSessionKey();
+  sessionTableBody.innerHTML = "";
+  let sessions = JSON.parse(localStorage.getItem(key)) || [];
+  sessions.forEach((session) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${new Date(session.start).toLocaleTimeString()}</td>
+                     <td>${new Date(session.end).toLocaleTimeString()}</td>
+                     <td>${formatTime(session.duration)}</td>`;
+    sessionTableBody.appendChild(row);
+  });
+}
+
+// Timer Functions
 function startTimer() {
   if (isRunning) return;
   isRunning = true;
@@ -149,13 +172,12 @@ function startTimer() {
       duration: 0,
     };
   }
-  // Continue from saved elapsedTime
   startTime = Date.now() - elapsedTime * 1000;
   timerInterval = setInterval(() => {
     elapsedTime = Math.floor((Date.now() - startTime) / 1000);
     updateTimerDisplay();
   }, 1000);
-  // Update Firebase every 5 seconds for realtime leaderboard updates.
+  // Update leaderboard on Firebase every 5 seconds
   firebaseUpdateInterval = setInterval(() => {
     updateLeaderboard(username, elapsedTime);
   }, 5000);
@@ -171,14 +193,11 @@ function pauseTimer() {
   clearInterval(timerInterval);
   clearInterval(firebaseUpdateInterval);
   firebaseUpdateInterval = null;
-  // End and record the session
   if (currentSession) {
     currentSession.end = new Date().toISOString();
     currentSession.duration = elapsedTime;
-    saveSessionLog(currentSession);
+    addLocalSessionLog(currentSession);
     updateLeaderboard(username, elapsedTime);
-    updateLifetimeStudyTime(currentSession.duration);
-    // Increase streak only once per day
     increaseStreak();
     currentSession = null;
   }
@@ -188,40 +207,14 @@ function updateStatus(status) {
   statusIndicator.innerText = status;
 }
 
-// Save the session log in Firebase under "sessions/username"
-function saveSessionLog(session) {
-  if (!username) return;
-  const sessionRef = ref(db, "sessions/" + username);
-  const newSessionRef = push(sessionRef);
-  set(newSessionRef, session);
-  loadSessionLog();
-}
-
-// Update leaderboard in Firebase under "leaderboard/username"
-// The time is stored as total seconds.
+// Update the leaderboard entry on Firebase.
 function updateLeaderboard(user, timeSec) {
   if (!user) return;
   const leaderboardRef = ref(db, "leaderboard/" + user);
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Update lifetime study time in Firebase under "lifetimeStudy/username"
-function updateLifetimeStudyTime(sessionDuration) {
-  if (!username) return;
-  const lifetimeRef = ref(db, "lifetimeStudy/" + username);
-  onValue(
-    lifetimeRef,
-    (snapshot) => {
-      let lifetime = snapshot.val() ? parseFloat(snapshot.val().total) : 0;
-      lifetime += sessionDuration / 3600;
-      set(lifetimeRef, { total: lifetime.toFixed(2) });
-      lifetimeTimeEl.innerText = lifetime.toFixed(2);
-    },
-    { onlyOnce: true }
-  );
-}
-
-// Load and display the leaderboard in realtime
+// Load the realtime leaderboard from Firebase.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
@@ -230,7 +223,7 @@ function loadLeaderboard() {
     for (let user in data) {
       arr.push({ user: user, totalSec: data[user].totalSec });
     }
-    // Sort descending by totalSec
+    // Sort descending by study time
     arr.sort((a, b) => b.totalSec - a.totalSec);
     leaderboardTableBody.innerHTML = "";
     arr.forEach((item) => {
@@ -242,32 +235,13 @@ function loadLeaderboard() {
   });
 }
 
-// Load session logs from Firebase so they persist after refresh.
-function loadSessionLog() {
-  if (!username) return;
-  const sessionRef = ref(db, "sessions/" + username);
-  onValue(sessionRef, (snapshot) => {
-    const data = snapshot.val();
-    sessionTableBody.innerHTML = "";
-    if (data) {
-      Object.values(data).forEach((session) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${new Date(session.start).toLocaleTimeString()}</td>
-                         <td>${new Date(session.end).toLocaleTimeString()}</td>
-                         <td>${formatTime(session.duration)}</td>`;
-        sessionTableBody.appendChild(row);
-      });
-    }
-  });
-}
-
-// Load streak counter from localStorage
+// Load streak from localStorage.
 function loadStreak() {
   let streak = localStorage.getItem("streak") || 0;
   streakCounterEl.innerText = streak;
 }
 
-// Increase daily streak only once per day
+// Increase the streak only once per day.
 function increaseStreak() {
   if (!localStorage.getItem("hasStudiedToday")) {
     let streak = parseInt(localStorage.getItem("streak")) || 0;
@@ -280,8 +254,12 @@ function increaseStreak() {
 
 // Event Listeners
 
-// Toggle Timer (Start/Pause) Button
+// Toggle timer only if username is set.
 toggleTimerBtn.addEventListener("click", () => {
+  if (!username) {
+    alert("Please set your name first.");
+    return;
+  }
   checkDailyReset();
   if (isRunning) {
     pauseTimer();
@@ -290,13 +268,18 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
-// Save Username Button
+// Save Username: once set, disable changes.
 saveUsernameBtn.addEventListener("click", () => {
-  username = usernameInput.value.trim();
-  if (username) {
+  const inputName = usernameInput.value.trim();
+  if (inputName) {
+    username = inputName;
     localStorage.setItem("studyUsername", username);
-    alert(`Username set to ${username}`);
-    loadSessionLog();
+    // Hide setup and show display
+    userSetupDiv.style.display = "none";
+    displayedUsernameEl.innerText = username;
+    userDisplayDiv.style.display = "block";
+    appContent.style.display = "block";
+    loadLocalSessionLog();
     loadLeaderboard();
     loadStreak();
   } else {
@@ -304,18 +287,7 @@ saveUsernameBtn.addEventListener("click", () => {
   }
 });
 
-// Set Daily Study Goal
-setGoalBtn.addEventListener("click", () => {
-  const goal = parseFloat(studyGoalInput.value);
-  if (!isNaN(goal) && goal > 0) {
-    dailyGoal = goal;
-    alert(`Daily study goal set to ${goal} hours`);
-  } else {
-    alert("Please enter a valid number for study goal.");
-  }
-});
-
-// View Previous Day's Data
+// View Previous Day's Leaderboard (stub)
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -335,14 +307,13 @@ prevDayBtn.addEventListener("click", () => {
   );
 });
 
-// On page load: restore timer state and load stored data.
+// On page load: restore timer state, check daily reset, and initialize data.
 window.addEventListener("load", () => {
   const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
   if (!isNaN(storedElapsed)) {
     elapsedTime = storedElapsed;
     updateTimerDisplay();
   }
-  // If the timer was running before refresh, pause it.
   if (localStorage.getItem("timerRunning") === "true") {
     isRunning = false;
     localStorage.setItem("timerRunning", "false");
@@ -351,10 +322,15 @@ window.addEventListener("load", () => {
   }
   checkDailyReset();
   loadLeaderboard();
-  loadSessionLog();
+  loadLocalSessionLog();
   loadStreak();
   displayRandomQuote();
   if (username) {
-    usernameInput.value = username;
+    userSetupDiv.style.display = "none";
+    displayedUsernameEl.innerText = username;
+    userDisplayDiv.style.display = "block";
+    appContent.style.display = "block";
+  } else {
+    appContent.style.display = "none";
   }
 });
