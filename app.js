@@ -1,4 +1,4 @@
-// Import Firebase modules from CDN (including remove)
+// Import Firebase modules from CDN (including remove and get)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getDatabase,
@@ -6,6 +6,7 @@ import {
   set,
   onValue,
   remove,
+  get,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // Firebase configuration (replace with your actual settings)
@@ -123,7 +124,7 @@ function loadLocalSessionLog() {
   sessionTableBody.innerHTML = "";
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
   // Filter out sessions shorter than 5 minutes.
-  sessions = sessions.filter(session => session.duration >= 300);
+  sessions = sessions.filter((session) => session.duration >= 300);
   localStorage.setItem(key, JSON.stringify(sessions));
   sessions.forEach((session) => {
     const row = document.createElement("tr");
@@ -258,7 +259,11 @@ function increaseStreak() {
 
 // Delete Account function – clears Firebase data (leaderboard), local storage, cookies, caches, and resets UI.
 function deleteAccount() {
-  if (confirm("Are you sure you want to delete your account? This will remove all your data and reset the app.")) {
+  if (
+    confirm(
+      "Are you sure you want to delete your account? This will remove all your data and reset the app."
+    )
+  ) {
     // Remove user's leaderboard entry from Firebase.
     const leaderboardRef = ref(db, "leaderboard/" + username);
     remove(leaderboardRef)
@@ -268,14 +273,15 @@ function deleteAccount() {
       .catch((error) => {
         console.error("Error removing leaderboard entry:", error);
       });
-      
+
     // Clear local storage and session storage.
     localStorage.clear();
     sessionStorage.clear();
 
     // Clear cookies.
-    document.cookie.split(";").forEach(function(c) {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+    document.cookie.split(";").forEach(function (c) {
+      document.cookie =
+        c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
     });
 
     // Clear cache storage if available.
@@ -292,8 +298,9 @@ function deleteAccount() {
   }
 }
 
-// Event Listeners
+// === Event Listeners ===
 
+// Toggle Timer Start/Pause
 toggleTimerBtn.addEventListener("click", () => {
   if (!username) {
     alert("Please set your name first.");
@@ -307,21 +314,46 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
+// Save Username with duplicate check (case-insensitive)
 saveUsernameBtn.addEventListener("click", () => {
   const inputName = usernameInput.value.trim();
-  if (inputName) {
-    username = inputName;
-    localStorage.setItem("studyUsername", username);
-    userSetupDiv.style.display = "none";
-    displayedUsernameEl.innerText = username;
-    userDisplayDiv.style.display = "block";
-    appContent.style.display = "block";
-    loadLocalSessionLog();
-    loadLeaderboard();
-    loadStreak();
-  } else {
+  if (!inputName) {
     alert("Please enter a valid name.");
+    return;
   }
+  // Lowercase comparison for duplicates
+  const lowerInput = inputName.toLowerCase();
+  const leaderboardRef = ref(db, "leaderboard");
+  get(leaderboardRef)
+    .then((snapshot) => {
+      const data = snapshot.val();
+      let exists = false;
+      if (data) {
+        for (const key in data) {
+          if (key.toLowerCase() === lowerInput) {
+            exists = true;
+            break;
+          }
+        }
+      }
+      if (exists) {
+        alert("This name already exists, try adding numbers.");
+        return;
+      } else {
+        username = inputName;
+        localStorage.setItem("studyUsername", username);
+        userSetupDiv.style.display = "none";
+        displayedUsernameEl.innerText = username;
+        userDisplayDiv.style.display = "block";
+        appContent.style.display = "block";
+        loadLocalSessionLog();
+        loadLeaderboard();
+        loadStreak();
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking username:", error);
+    });
 });
 
 if (deleteAccountBtn) {
@@ -333,14 +365,18 @@ prevDayBtn.addEventListener("click", () => {
   yesterday.setDate(yesterday.getDate() - 1);
   const dateKey = yesterday.toDateString();
   const historyRef = ref(db, "history/" + dateKey + "/leaderboard");
-  onValue(historyRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      prevDayDataEl.innerText = JSON.stringify(data);
-    } else {
-      prevDayDataEl.innerText = "No data for " + dateKey;
-    }
-  }, { onlyOnce: true });
+  onValue(
+    historyRef,
+    (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        prevDayDataEl.innerText = JSON.stringify(data);
+      } else {
+        prevDayDataEl.innerText = "No data for " + dateKey;
+      }
+    },
+    { onlyOnce: true }
+  );
 });
 
 window.addEventListener("load", () => {
