@@ -1,16 +1,14 @@
-// app.js
 // Import Firebase modules from CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getDatabase,
   ref,
   set,
-  update,
   onValue,
   push,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Firebase configuration (provided)
+// Firebase configuration (as provided)
 const firebaseConfig = {
   apiKey: "AIzaSyAx3b-2EPm2qPjYu6L07GCCKAkoF_z1sF0",
   authDomain: "poralagbe-17c0e.firebaseapp.com",
@@ -26,8 +24,9 @@ const db = getDatabase(app);
 
 // Global Variables
 let timerInterval = null;
+let firebaseUpdateInterval = null;
 let startTime = null;
-let elapsedTime = 0; // in seconds
+let elapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0; // in seconds
 let isRunning = false;
 let username = localStorage.getItem("studyUsername") || "";
 let currentSession = null;
@@ -97,20 +96,21 @@ function updateTimerDisplay() {
   studyTimerEl.innerText = formatTime(elapsedTime);
   // Update progress bar if a goal is set (goal is in hours)
   if (dailyGoal > 0) {
-    const progressPercent = Math.min((elapsedTime / (dailyGoal * 3600)) * 100, 100);
+    const progressPercent = Math.min(
+      (elapsedTime / (dailyGoal * 3600)) * 100,
+      100
+    );
     goalProgressEl.style.width = progressPercent + "%";
   }
+  localStorage.setItem("elapsedTime", elapsedTime);
 }
 
 // Check if it is a new day – if yes, reset timer & leaderboard data locally.
-// (Note: In a production app, a backend cron or cloud function might be used.)
 function checkDailyReset() {
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem("studyDate");
   if (storedDate !== todayStr) {
-    // Save previous day's leaderboard data to history (stub)
     savePreviousDayData(storedDate);
-    // Reset daily data
     elapsedTime = 0;
     localStorage.setItem("studyDate", todayStr);
     localStorage.setItem("streak", 0);
@@ -119,7 +119,7 @@ function checkDailyReset() {
   }
 }
 
-// Save previous day data (for demonstration, we write a stub object)
+// Save previous day data (stub)
 function savePreviousDayData(dateStr) {
   if (!dateStr) return;
   const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
@@ -131,32 +131,40 @@ function savePreviousDayData(dateStr) {
 function startTimer() {
   if (isRunning) return;
   isRunning = true;
+  localStorage.setItem("timerRunning", "true");
   updateStatus("Studying");
   startSound.play();
-  // Record the session start if one is not already set
   if (!currentSession) {
     currentSession = {
       start: new Date().toISOString(),
       duration: 0,
     };
   }
+  // Set the startTime so that elapsedTime continues from the stored value
   startTime = Date.now() - elapsedTime * 1000;
   timerInterval = setInterval(() => {
     elapsedTime = Math.floor((Date.now() - startTime) / 1000);
     updateTimerDisplay();
   }, 1000);
+  // Update Firebase every 5 seconds for realtime leaderboard updates.
+  firebaseUpdateInterval = setInterval(() => {
+    updateLeaderboard(username, elapsedTime);
+  }, 5000);
 }
 
 function pauseTimer() {
   if (!isRunning) return;
   isRunning = false;
+  localStorage.setItem("timerRunning", "false");
   updateStatus("Paused");
   pauseSound.play();
   clearInterval(timerInterval);
-  // End and record the session
+  clearInterval(firebaseUpdateInterval);
+  firebaseUpdateInterval = null;
+  // End and record the current session
   if (currentSession) {
     currentSession.end = new Date().toISOString();
-    currentSession.duration = elapsedTime; // seconds
+    currentSession.duration = elapsedTime; // in seconds
     saveSessionLog(currentSession);
     updateLeaderboard(username, elapsedTime);
     updateLifetimeStudyTime(currentSession.duration);
@@ -179,10 +187,9 @@ function updateStatus(status) {
 // Save session log in Firebase under "sessions/username"
 function saveSessionLog(session) {
   const sessionRef = ref(db, "sessions/" + username);
-  // Push a new session log entry
   const newSessionRef = push(sessionRef);
   set(newSessionRef, session);
-  // Also update the local session log table
+  // Update local session log table
   const row = document.createElement("tr");
   row.innerHTML = `<td>${new Date(session.start).toLocaleTimeString()}</td>
                    <td>${new Date(session.end).toLocaleTimeString()}</td>
@@ -286,7 +293,7 @@ setGoalBtn.addEventListener("click", () => {
   }
 });
 
-// View previous day's data (retrieves stubbed data from Firebase history)
+// View previous day's data (stub retrieval from Firebase history)
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -306,8 +313,20 @@ prevDayBtn.addEventListener("click", () => {
   );
 });
 
-// Initial Setup on page load
+// On page load: restore timer state and other data
 window.addEventListener("load", () => {
+  // Load elapsed time from localStorage
+  const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
+  if (!isNaN(storedElapsed)) {
+    elapsedTime = storedElapsed;
+    updateTimerDisplay();
+  }
+  // If the timer was running before refresh, pause it.
+  if (localStorage.getItem("timerRunning") === "true") {
+    isRunning = false;
+    localStorage.setItem("timerRunning", "false");
+    updateStatus("Paused");
+  }
   checkDailyReset();
   loadLeaderboard();
   loadStreak();
