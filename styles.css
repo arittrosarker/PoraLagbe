@@ -5,17 +5,17 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #121212, #1f1f1f);
+  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
   color: #e0e0e0;
 }
 
 .container {
-  max-width: 960px;
+  max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(10, 10, 10, 0.9);
   border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0,223,255,0.25);
+  box-shadow: 0 0 30px rgba(0, 223, 255, 0.3);
 }
 
 /* Header styling */
@@ -23,7 +23,7 @@ header {
   text-align: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #333;
+  border-bottom: 2px solid #003f63;
 }
 header h1 {
   color: #00dfff;
@@ -31,15 +31,15 @@ header h1 {
 }
 #userSetup input,
 #userSetup button {
-  padding: 8px 10px;
-  margin: 5px;
+  padding: 10px 12px;
+  margin: 8px;
   border: none;
   border-radius: 4px;
-  font-size: 1em;
+  font-size: 1rem;
   outline: none;
 }
 #userSetup input {
-  background-color: #1f1f1f;
+  background-color: #0f0f0f;
   color: #e0e0e0;
 }
 #userSetup button {
@@ -52,7 +52,7 @@ header h1 {
   background-color: #00caff;
 }
 #userDisplay {
-  font-size: 1.2em;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-top: 10px;
 }
@@ -61,6 +61,7 @@ header h1 {
 .main-flex {
   display: flex;
   gap: 20px;
+  align-items: flex-start;
 }
 .left-section {
   flex: 0 0 70%;
@@ -75,21 +76,22 @@ header h1 {
   margin-bottom: 30px;
 }
 .animated-clock {
-  font-size: 1.5em;
+  font-size: 1.5rem;
   margin-bottom: 10px;
+  color: #00dfff;
 }
 .status-indicator {
-  font-size: 1.2em;
+  font-size: 1.2rem;
   margin-bottom: 10px;
 }
 .study-timer {
-  font-size: 4em;
+  font-size: 4rem;
   font-weight: bold;
   margin: 20px 0;
 }
 .timer-controls button {
-  padding: 10px 20px;
-  margin: 5px;
+  padding: 12px 24px;
+  margin: 8px;
   background-color: #00dfff;
   border: none;
   border-radius: 4px;
@@ -109,18 +111,26 @@ header h1 {
   margin-bottom: 30px;
 }
 .motivational-quote {
-  font-size: 1.2em;
+  font-size: 1.3rem;
   margin-bottom: 10px;
+  color: #00dfff;
 }
 .daily-streak {
-  font-size: 1em;
-  margin: 5px;
+  font-size: 1.1rem;
 }
 
-/* Session Log & Leaderboard */
-.session-log,
-.leaderboard-section {
+/* Session Log */
+.session-log {
   margin-top: 30px;
+}
+.session-log h2 {
+  margin-bottom: 10px;
+}
+.session-log .tip {
+  font-size: 0.9rem;
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 10px;
 }
 table {
   width: 100%;
@@ -128,11 +138,42 @@ table {
   margin-bottom: 20px;
 }
 table, th, td {
-  border: 1px solid #333;
+  border: 1px solid #003f63;
 }
 th, td {
   padding: 10px;
   text-align: center;
+}
+th {
+  background-color: #00dfff;
+  color: #121212;
+}
+
+/* Leaderboard Table */
+.leaderboard-section h2 {
+  margin-bottom: 10px;
+}
+.leaderboard-section table th,
+.leaderboard-section table td {
+  border-color: #003f63;
+}
+.leaderboard-section table th {
+  background-color: #00dfff;
+  color: #121212;
+}
+
+/* Special Styling for Top 3 Ranks in Leaderboard */
+tr.first {
+  background-color: #ffd700 !important; /* Gold */
+  color: #121212;
+}
+tr.second {
+  background-color: #c0c0c0 !important; /* Silver */
+  color: #121212;
+}
+tr.third {
+  background-color: #cd7f32 !important; /* Bronze */
+  color: #121212;
 }
 
 /* Previous Day Button */
@@ -149,6 +190,16 @@ th, td {
   background-color: #00caff;
 }
 
+/* Footer/Credits */
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 10px;
+  border-top: 2px solid #003f63;
+  font-size: 0.9rem;
+  color: #00dfff;
+}
+
 /* Responsive Styling */
 @media (max-width: 800px) {
   .main-flex {
@@ -160,7 +211,7 @@ th, td {
 }
 @media (max-width: 600px) {
   .study-timer {
-    font-size: 2.5em;
+    font-size: 2.5rem;
   }
   .timer-controls button {
     width: 100%;
