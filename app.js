@@ -31,6 +31,7 @@ let elapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0; // seconds
 let isRunning = false;
 let currentSession = null;
 let username = localStorage.getItem("studyUsername") || "";
+let bannedWords = [];
 
 // HTML Elements
 const studyTimerEl = document.getElementById("studyTimer");
@@ -67,6 +68,23 @@ const quotes = [
 function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   motivationalQuoteEl.innerText = quotes[randomIndex];
+}
+
+// Load banned words from "badword.txt"
+// Ensure that badword.txt is placed in the same directory as this file.
+fetch("badword.txt")
+  .then((response) => response.text())
+  .then((text) => {
+    bannedWords = text.split("\n").map((word) => word.trim().toLowerCase());
+  })
+  .catch((error) => {
+    console.error("Error loading banned words:", error);
+  });
+
+// Check if the name contains any banned word (case-insensitive substring check)
+function containsBannedWord(name) {
+  const lowerName = name.toLowerCase();
+  return bannedWords.some((word) => lowerName.includes(word));
 }
 
 // Animated clock display
@@ -281,7 +299,11 @@ function deleteAccount() {
     // Clear cookies.
     document.cookie.split(";").forEach(function (c) {
       document.cookie =
-        c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+        c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" +
+            new Date(0).toUTCString() +
+            ";path=/");
     });
 
     // Clear cache storage if available.
@@ -314,14 +336,21 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
-// Save Username with duplicate check (case-insensitive)
+// Save Username with duplicate and banned word checks
 saveUsernameBtn.addEventListener("click", () => {
   const inputName = usernameInput.value.trim();
   if (!inputName) {
     alert("Please enter a valid name.");
     return;
   }
-  // Lowercase comparison for duplicates
+
+  // Check for banned words
+  if (containsBannedWord(inputName)) {
+    alert("This name is not allowed.");
+    return;
+  }
+
+  // Lowercase comparison for duplicates in the Firebase "leaderboard" node
   const lowerInput = inputName.toLowerCase();
   const leaderboardRef = ref(db, "leaderboard");
   get(leaderboardRef)
