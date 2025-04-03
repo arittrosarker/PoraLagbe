@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Study Timer & Leaderboard</title>
     <!-- Google Fonts for modern styling -->
     <link
@@ -23,19 +20,13 @@
         <h1>Study Timer & Leaderboard</h1>
         <!-- User Setup: shown only if no name is set -->
         <div id="userSetup">
-          <input
-            type="text"
-            id="usernameInput"
-            placeholder="Enter your name"
-          />
+          <input type="text" id="usernameInput" placeholder="Enter your name" />
           <button id="saveUsernameBtn">Save Name</button>
         </div>
         <!-- When the name is set, display user's name and the Delete Account button -->
         <div id="userDisplay" style="display:none;">
           Hello, <span id="displayedUsername"></span>
-          <button id="deleteAccountBtn" class="delete-btn">
-            Delete Account
-          </button>
+          <button id="deleteAccountBtn" class="delete-btn">Delete Account</button>
         </div>
       </header>
 
@@ -48,12 +39,8 @@
               <!-- Timer Section -->
               <section class="timer-section">
                 <div class="animated-clock" id="animatedClock"></div>
-                <div class="status-indicator" id="statusIndicator">
-                  Idle
-                </div>
-                <div class="study-timer" id="studyTimer">
-                  00:00:00
-                </div>
+                <div class="status-indicator" id="statusIndicator">Idle</div>
+                <div class="study-timer" id="studyTimer">00:00:00</div>
                 <div class="timer-controls">
                   <!-- Single toggle button for Start/Pause -->
                   <button id="toggleTimer">Start</button>
@@ -65,8 +52,7 @@
 
               <!-- Additional Info -->
               <section class="additional-info">
-                <div class="motivational-quote" id="motivationalQuote">
-                </div>
+                <div class="motivational-quote" id="motivationalQuote"></div>
                 <div class="daily-streak">
                   Streak: <span id="streakCounter">0</span> days
                 </div>
