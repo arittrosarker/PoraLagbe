@@ -5,10 +5,9 @@ import {
   ref,
   set,
   onValue,
-  push,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// Firebase configuration (replace with your settings)
+// Firebase configuration (replace with your actual settings)
 const firebaseConfig = {
   apiKey: "AIzaSyAx3b-2EPm2qPjYu6L07GCCKAkoF_z1sF0",
   authDomain: "poralagbe-17c0e.firebaseapp.com",
@@ -29,8 +28,6 @@ let startTime = null;
 let elapsedTime = parseInt(localStorage.getItem("elapsedTime")) || 0; // seconds
 let isRunning = false;
 let currentSession = null;
-
-// Require a name before allowing app usage.
 let username = localStorage.getItem("studyUsername") || "";
 
 // HTML Elements
@@ -81,7 +78,7 @@ updateClock();
 function formatTime(seconds) {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 3600 % 60;
+  const secs = seconds % 60;
   return (
     String(hrs).padStart(2, "0") +
     ":" +
@@ -103,40 +100,14 @@ function updateTimerDisplay() {
   localStorage.setItem("elapsedTime", elapsedTime);
 }
 
-// Check if it's a new day; reset local data if needed.
-function checkDailyReset() {
-  const todayStr = new Date().toDateString();
-  const storedDate = localStorage.getItem("studyDate");
-  if (storedDate !== todayStr) {
-    savePreviousDayData(storedDate); // (stub for leaderboard history)
-    elapsedTime = 0;
-    localStorage.setItem("studyDate", todayStr);
-    localStorage.removeItem("hasStudiedToday");
-    localStorage.setItem("streak", 0);
-    streakCounterEl.innerText = 0;
-    // Clear today's session log
-    localStorage.removeItem(getSessionKey());
-    updateTimerDisplay();
-    updateStatus("Idle");
-    loadLocalSessionLog();
-  }
-}
-
-// Save previous day's leaderboard data (stub)
-function savePreviousDayData(dateStr) {
-  if (!dateStr) return;
-  const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
-  const leaderboardData = { message: "Leaderboard data for " + dateStr };
-  set(leaderboardRef, leaderboardData);
-}
-
 // Returns the localStorage key for today's session log.
 function getSessionKey() {
   return "sessionLog_" + new Date().toDateString();
 }
 
-// Local Session Log: add a session and reload log.
+// Local Session Log: Add the session if it is longer than 5 minutes.
 function addLocalSessionLog(session) {
+  if (session.duration < 300) return; // Ignore sessions shorter than 5 minutes
   const key = getSessionKey();
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
   sessions.push(session);
@@ -158,6 +129,32 @@ function loadLocalSessionLog() {
   });
 }
 
+// Check for new day; reset local data if so.
+function checkDailyReset() {
+  const todayStr = new Date().toDateString();
+  const storedDate = localStorage.getItem("studyDate");
+  if (storedDate !== todayStr) {
+    savePreviousDayData(storedDate);
+    elapsedTime = 0;
+    localStorage.setItem("studyDate", todayStr);
+    localStorage.removeItem("hasStudiedToday");
+    localStorage.setItem("streak", 0);
+    streakCounterEl.innerText = 0;
+    localStorage.removeItem(getSessionKey());
+    updateTimerDisplay();
+    updateStatus("Idle");
+    loadLocalSessionLog();
+  }
+}
+
+// Save previous day's leaderboard data (stub)
+function savePreviousDayData(dateStr) {
+  if (!dateStr) return;
+  const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
+  const leaderboardData = { message: "Leaderboard data for " + dateStr };
+  set(leaderboardRef, leaderboardData);
+}
+
 // Timer Functions
 function startTimer() {
   if (isRunning) return;
@@ -177,7 +174,6 @@ function startTimer() {
     elapsedTime = Math.floor((Date.now() - startTime) / 1000);
     updateTimerDisplay();
   }, 1000);
-  // Update leaderboard on Firebase every 5 seconds
   firebaseUpdateInterval = setInterval(() => {
     updateLeaderboard(username, elapsedTime);
   }, 5000);
@@ -207,14 +203,14 @@ function updateStatus(status) {
   statusIndicator.innerText = status;
 }
 
-// Update the leaderboard entry on Firebase.
+// Update leaderboard entry on Firebase.
 function updateLeaderboard(user, timeSec) {
   if (!user) return;
   const leaderboardRef = ref(db, "leaderboard/" + user);
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Load the realtime leaderboard from Firebase.
+// Load realtime leaderboard from Firebase and update the table with rank.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
@@ -223,13 +219,18 @@ function loadLeaderboard() {
     for (let user in data) {
       arr.push({ user: user, totalSec: data[user].totalSec });
     }
-    // Sort descending by study time
+    // Sort descending by study time.
     arr.sort((a, b) => b.totalSec - a.totalSec);
     leaderboardTableBody.innerHTML = "";
-    arr.forEach((item) => {
+    arr.forEach((item, index) => {
+      const rank = index + 1;
       const formattedTime = formatLeaderboardTime(item.totalSec);
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${item.user}</td><td>${formattedTime}</td>`;
+      // Add special classes for the top three
+      if (rank === 1) row.classList.add("first");
+      else if (rank === 2) row.classList.add("second");
+      else if (rank === 3) row.classList.add("third");
+      row.innerHTML = `<td>${rank}</td><td>${item.user}</td><td>${formattedTime}</td>`;
       leaderboardTableBody.appendChild(row);
     });
   });
@@ -254,7 +255,6 @@ function increaseStreak() {
 
 // Event Listeners
 
-// Toggle timer only if username is set.
 toggleTimerBtn.addEventListener("click", () => {
   if (!username) {
     alert("Please set your name first.");
@@ -268,13 +268,11 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
-// Save Username: once set, disable changes.
 saveUsernameBtn.addEventListener("click", () => {
   const inputName = usernameInput.value.trim();
   if (inputName) {
     username = inputName;
     localStorage.setItem("studyUsername", username);
-    // Hide setup and show display
     userSetupDiv.style.display = "none";
     displayedUsernameEl.innerText = username;
     userDisplayDiv.style.display = "block";
@@ -287,7 +285,6 @@ saveUsernameBtn.addEventListener("click", () => {
   }
 });
 
-// View Previous Day's Leaderboard (stub)
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -307,7 +304,6 @@ prevDayBtn.addEventListener("click", () => {
   );
 });
 
-// On page load: restore timer state, check daily reset, and initialize data.
 window.addEventListener("load", () => {
   const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
   if (!isNaN(storedElapsed)) {
