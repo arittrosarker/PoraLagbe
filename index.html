@@ -2,48 +2,58 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Study Timer & Leaderboard</title>
+    <!-- Google Fonts for a sleek UI -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
-    <!-- We use module script so our app.js can use ES6 imports -->
+    <!-- Use module script to allow ES6 imports in app.js -->
     <script type="module" src="app.js" defer></script>
   </head>
   <body>
     <div class="container">
-      <!-- Header with User Name and Custom Status -->
+      <!-- Header with user name & custom status -->
       <header>
         <h1>Study Timer & Leaderboard</h1>
         <div class="user-settings">
           <input type="text" id="usernameInput" placeholder="Enter your name" />
           <button id="saveUsernameBtn">Save Name</button>
-          <input type="text" id="customStatus" placeholder="Set custom status message" />
+          <input
+            type="text"
+            id="customStatus"
+            placeholder="Set custom status message"
+          />
         </div>
       </header>
 
       <!-- Main content -->
       <main>
-        <!-- Timer section -->
+        <!-- Timer Section -->
         <section class="timer-section">
           <!-- Animated Clock Display -->
           <div class="animated-clock" id="animatedClock"></div>
           <!-- Status Indicator -->
           <div class="status-indicator" id="statusIndicator">Idle</div>
-          <!-- Study Timer Display (center of page) -->
+          <!-- Study Timer Display -->
           <div class="study-timer" id="studyTimer">00:00:00</div>
           <div class="timer-controls">
             <button id="startBtn">Start</button>
             <button id="pauseBtn">Pause</button>
             <button id="resetBtn">Reset</button>
           </div>
-          <!-- Audio elements for feedback (provide your own mp3 files) -->
+          <!-- Audio Elements (ensure you add your own audio files) -->
           <audio id="startSound" src="start.mp3"></audio>
           <audio id="pauseSound" src="pause.mp3"></audio>
-          <!-- Study Goals & Progress Bar -->
+          <!-- Study Goal & Progress -->
           <div class="study-goal">
-            <input type="number" id="studyGoalInput" placeholder="Set Daily Study Goal (hrs)" />
+            <input
+              type="number"
+              id="studyGoalInput"
+              placeholder="Set Daily Study Goal (hrs)"
+            />
             <button id="setGoalBtn">Set Goal</button>
             <div class="progress-bar">
               <div id="goalProgress"></div>
@@ -51,7 +61,7 @@
           </div>
         </section>
 
-        <!-- Additional info: Motivational Quote, Daily Streak, Lifetime Study Time -->
+        <!-- Additional Info: Motivational Quote, Daily Streak, Lifetime Study -->
         <section class="additional-info">
           <div class="motivational-quote" id="motivationalQuote"></div>
           <div class="daily-streak">
@@ -89,7 +99,7 @@
             </thead>
             <tbody></tbody>
           </table>
-          <!-- Date Icon / Button to view previous day's data -->
+          <!-- Previous Day Data -->
           <div class="previous-day">
             <button id="prevDayBtn">View Previous Day's Data</button>
             <div id="prevDayData"></div>
