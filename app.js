@@ -1,10 +1,11 @@
-// Import Firebase modules from CDN
+// Import Firebase modules from CDN (including remove)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getDatabase,
   ref,
   set,
   onValue,
+  remove,
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // Firebase configuration (replace with your actual settings)
@@ -35,6 +36,7 @@ const studyTimerEl = document.getElementById("studyTimer");
 const toggleTimerBtn = document.getElementById("toggleTimer");
 const usernameInput = document.getElementById("usernameInput");
 const saveUsernameBtn = document.getElementById("saveUsernameBtn");
+const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 const userSetupDiv = document.getElementById("userSetup");
 const userDisplayDiv = document.getElementById("userDisplay");
 const displayedUsernameEl = document.getElementById("displayedUsername");
@@ -115,12 +117,12 @@ function addLocalSessionLog(session) {
   loadLocalSessionLog();
 }
 
-// Load the local session log and update the table, filtering out sessions < 5 minutes.
+// Load the local session log and update the table.
 function loadLocalSessionLog() {
   const key = getSessionKey();
   sessionTableBody.innerHTML = "";
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
-  // Filter and update storage in case there are sessions under 5 minutes
+  // Filter out sessions shorter than 5 minutes.
   sessions = sessions.filter(session => session.duration >= 300);
   localStorage.setItem(key, JSON.stringify(sessions));
   sessions.forEach((session) => {
@@ -206,14 +208,14 @@ function updateStatus(status) {
   statusIndicator.innerText = status;
 }
 
-// Update leaderboard entry on Firebase.
+// Update leaderboard entry in Firebase.
 function updateLeaderboard(user, timeSec) {
   if (!user) return;
   const leaderboardRef = ref(db, "leaderboard/" + user);
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Load realtime leaderboard from Firebase; update table with a rank and special styling for top 3.
+// Load realtime leaderboard from Firebase and update the table.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
@@ -254,6 +256,42 @@ function increaseStreak() {
   }
 }
 
+// Delete Account function – clears Firebase data (leaderboard), local storage, cookies, caches, and resets UI.
+function deleteAccount() {
+  if (confirm("Are you sure you want to delete your account? This will remove all your data and reset the app.")) {
+    // Remove user's leaderboard entry from Firebase.
+    const leaderboardRef = ref(db, "leaderboard/" + username);
+    remove(leaderboardRef)
+      .then(() => {
+        console.log("Firebase leaderboard entry removed.");
+      })
+      .catch((error) => {
+        console.error("Error removing leaderboard entry:", error);
+      });
+      
+    // Clear local storage and session storage.
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Clear cookies.
+    document.cookie.split(";").forEach(function(c) {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+    });
+
+    // Clear cache storage if available.
+    if ("caches" in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          caches.delete(name);
+        });
+      });
+    }
+
+    // Reload the page to reset the UI back to the "Set Name" state.
+    location.reload();
+  }
+}
+
 // Event Listeners
 
 toggleTimerBtn.addEventListener("click", () => {
@@ -286,23 +324,23 @@ saveUsernameBtn.addEventListener("click", () => {
   }
 });
 
+if (deleteAccountBtn) {
+  deleteAccountBtn.addEventListener("click", deleteAccount);
+}
+
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   const dateKey = yesterday.toDateString();
   const historyRef = ref(db, "history/" + dateKey + "/leaderboard");
-  onValue(
-    historyRef,
-    (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        prevDayDataEl.innerText = JSON.stringify(data);
-      } else {
-        prevDayDataEl.innerText = "No data for " + dateKey;
-      }
-    },
-    { onlyOnce: true }
-  );
+  onValue(historyRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      prevDayDataEl.innerText = JSON.stringify(data);
+    } else {
+      prevDayDataEl.innerText = "No data for " + dateKey;
+    }
+  }, { onlyOnce: true });
 });
 
 window.addEventListener("load", () => {
