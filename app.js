@@ -105,7 +105,7 @@ function getSessionKey() {
   return "sessionLog_" + new Date().toDateString();
 }
 
-// Local Session Log: Add the session if it is longer than 5 minutes.
+// Local Session Log: Add the session only if duration >= 300 seconds.
 function addLocalSessionLog(session) {
   if (session.duration < 300) return; // Ignore sessions shorter than 5 minutes
   const key = getSessionKey();
@@ -115,11 +115,14 @@ function addLocalSessionLog(session) {
   loadLocalSessionLog();
 }
 
-// Load the local session log and update the table.
+// Load the local session log and update the table, filtering out sessions < 5 minutes.
 function loadLocalSessionLog() {
   const key = getSessionKey();
   sessionTableBody.innerHTML = "";
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
+  // Filter and update storage in case there are sessions under 5 minutes
+  sessions = sessions.filter(session => session.duration >= 300);
+  localStorage.setItem(key, JSON.stringify(sessions));
   sessions.forEach((session) => {
     const row = document.createElement("tr");
     row.innerHTML = `<td>${new Date(session.start).toLocaleTimeString()}</td>
@@ -210,7 +213,7 @@ function updateLeaderboard(user, timeSec) {
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Load realtime leaderboard from Firebase and update the table with rank.
+// Load realtime leaderboard from Firebase; update table with a rank and special styling for top 3.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
@@ -219,14 +222,12 @@ function loadLeaderboard() {
     for (let user in data) {
       arr.push({ user: user, totalSec: data[user].totalSec });
     }
-    // Sort descending by study time.
     arr.sort((a, b) => b.totalSec - a.totalSec);
     leaderboardTableBody.innerHTML = "";
     arr.forEach((item, index) => {
       const rank = index + 1;
       const formattedTime = formatLeaderboardTime(item.totalSec);
       const row = document.createElement("tr");
-      // Add special classes for the top three
       if (rank === 1) row.classList.add("first");
       else if (rank === 2) row.classList.add("second");
       else if (rank === 3) row.classList.add("third");
