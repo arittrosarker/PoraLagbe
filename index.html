@@ -10,101 +10,91 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <!-- Use module script to allow ES6 imports in app.js -->
+    <!-- Use module script for ES6 modules -->
     <script type="module" src="app.js" defer></script>
   </head>
   <body>
     <div class="container">
-      <!-- Header with user name & custom status -->
+      <!-- Header Section -->
       <header>
         <h1>Study Timer & Leaderboard</h1>
-        <div class="user-settings">
+        <!-- User Setup: shown only if no name is saved -->
+        <div id="userSetup">
           <input type="text" id="usernameInput" placeholder="Enter your name" />
           <button id="saveUsernameBtn">Save Name</button>
-          <input
-            type="text"
-            id="customStatus"
-            placeholder="Set custom status message"
-          />
+        </div>
+        <!-- Once the user sets a name, this is shown and the input is hidden -->
+        <div id="userDisplay" style="display:none;">
+          Hello, <span id="displayedUsername"></span>
         </div>
       </header>
 
-      <!-- Main content -->
-      <main>
-        <!-- Timer Section -->
-        <section class="timer-section">
-          <!-- Animated Clock Display -->
-          <div class="animated-clock" id="animatedClock"></div>
-          <!-- Status Indicator -->
-          <div class="status-indicator" id="statusIndicator">Idle</div>
-          <!-- Study Timer Display -->
-          <div class="study-timer" id="studyTimer">00:00:00</div>
-          <div class="timer-controls">
-            <!-- Single toggle button for Start/Pause -->
-            <button id="toggleTimer">Start</button>
-          </div>
-          <!-- Audio Elements (ensure these files exist) -->
-          <audio id="startSound" src="start.mp3"></audio>
-          <audio id="pauseSound" src="pause.mp3"></audio>
-          <!-- Study Goal & Progress -->
-          <div class="study-goal">
-            <input
-              type="number"
-              id="studyGoalInput"
-              placeholder="Set Daily Study Goal (hrs)"
-            />
-            <button id="setGoalBtn">Set Goal</button>
-            <div class="progress-bar">
-              <div id="goalProgress"></div>
+      <!-- Main App Content; hidden until the user sets their name -->
+      <div id="appContent" style="display:none;">
+        <main>
+          <div class="main-flex">
+            <!-- Left Section: Timer, Additional Info, Session Log -->
+            <div class="left-section">
+              <!-- Timer Section -->
+              <section class="timer-section">
+                <div class="animated-clock" id="animatedClock"></div>
+                <div class="status-indicator" id="statusIndicator">Idle</div>
+                <div class="study-timer" id="studyTimer">00:00:00</div>
+                <div class="timer-controls">
+                  <!-- Single toggle button for Start/Pause -->
+                  <button id="toggleTimer">Start</button>
+                </div>
+                <!-- Audio elements (ensure these files are provided) -->
+                <audio id="startSound" src="start.mp3"></audio>
+                <audio id="pauseSound" src="pause.mp3"></audio>
+              </section>
+
+              <!-- Additional Info -->
+              <section class="additional-info">
+                <div class="motivational-quote" id="motivationalQuote"></div>
+                <div class="daily-streak">
+                  Streak: <span id="streakCounter">0</span> days
+                </div>
+              </section>
+
+              <!-- Session Log (local for today) -->
+              <section class="session-log">
+                <h2>Session Log</h2>
+                <table id="sessionTable">
+                  <thead>
+                    <tr>
+                      <th>Start Time</th>
+                      <th>End Time</th>
+                      <th>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </section>
+            </div>
+
+            <!-- Right Section: Leaderboard -->
+            <div class="right-section">
+              <section class="leaderboard-section">
+                <h2>Leaderboard</h2>
+                <table id="leaderboardTable">
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Study Time</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <div class="previous-day">
+                  <button id="prevDayBtn">View Previous Day's Data</button>
+                  <div id="prevDayData"></div>
+                </div>
+              </section>
             </div>
           </div>
-        </section>
-
-        <!-- Additional Info: Motivational Quote, Daily Streak, Lifetime Study -->
-        <section class="additional-info">
-          <div class="motivational-quote" id="motivationalQuote"></div>
-          <div class="daily-streak">
-            Streak: <span id="streakCounter">0</span> days
-          </div>
-          <div class="lifetime-study">
-            Lifetime Study: <span id="lifetimeTime">0</span> hrs
-          </div>
-        </section>
-
-        <!-- Session Log -->
-        <section class="session-log">
-          <h2>Session Log</h2>
-          <table id="sessionTable">
-            <thead>
-              <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Duration</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </section>
-
-        <!-- Leaderboard Section -->
-        <section class="leaderboard-section">
-          <h2>Leaderboard</h2>
-          <table id="leaderboardTable">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Study Time</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <!-- Previous Day Data -->
-          <div class="previous-day">
-            <button id="prevDayBtn">View Previous Day's Data</button>
-            <div id="prevDayData"></div>
-          </div>
-        </section>
-      </main>
+        </main>
+      </div>
     </div>
   </body>
 </html>
