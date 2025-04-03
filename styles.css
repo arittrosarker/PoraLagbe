@@ -1,4 +1,4 @@
-/* Import Roboto font for modern styling */
+/* Import Roboto for modern styling */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body {
@@ -15,7 +15,7 @@ body {
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.75);
   border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.25);
+  box-shadow: 0 0 20px rgba(0,223,255,0.25);
 }
 
 /* Header styling */
@@ -26,14 +26,11 @@ header {
   border-bottom: 1px solid #333;
 }
 header h1 {
-  color: #39ff14;
+  color: #00dfff;
   margin: 0;
 }
-.user-settings {
-  margin-top: 10px;
-}
-.user-settings input,
-.user-settings button {
+#userSetup input,
+#userSetup button {
   padding: 8px 10px;
   margin: 5px;
   border: none;
@@ -41,18 +38,35 @@ header h1 {
   font-size: 1em;
   outline: none;
 }
-.user-settings input {
+#userSetup input {
   background-color: #1f1f1f;
   color: #e0e0e0;
 }
-.user-settings button {
-  background-color: #39ff14;
+#userSetup button {
+  background-color: #00dfff;
   color: #121212;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-.user-settings button:hover {
-  background-color: #32e10f;
+#userSetup button:hover {
+  background-color: #00caff;
+}
+#userDisplay {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Main Flex Container */
+.main-flex {
+  display: flex;
+  gap: 20px;
+}
+.left-section {
+  flex: 0 0 70%;
+}
+.right-section {
+  flex: 0 0 30%;
 }
 
 /* Timer Section */
@@ -76,56 +90,17 @@ header h1 {
 .timer-controls button {
   padding: 10px 20px;
   margin: 5px;
-  background-color: #39ff14;
+  background-color: #00dfff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   color: #121212;
   font-weight: bold;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background-color 0.3s ease;
 }
 .timer-controls button:hover {
   transform: scale(1.05);
-}
-
-/* Study Goal & Progress */
-.study-goal {
-  margin-top: 20px;
-}
-.study-goal input,
-.study-goal button {
-  padding: 8px;
-  margin: 5px;
-  border: none;
-  border-radius: 4px;
-  outline: none;
-}
-.study-goal input {
-  background-color: #1f1f1f;
-  color: #e0e0e0;
-}
-.study-goal button {
-  background-color: #39ff14;
-  color: #121212;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.study-goal button:hover {
-  background-color: #32e10f;
-}
-.progress-bar {
-  background-color: #333;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 10px auto;
-  height: 20px;
-  width: 80%;
-}
-#goalProgress {
-  height: 100%;
-  background-color: #39ff14;
-  width: 0%;
-  transition: width 0.5s ease;
+  background-color: #00caff;
 }
 
 /* Additional Info */
@@ -137,13 +112,12 @@ header h1 {
   font-size: 1.2em;
   margin-bottom: 10px;
 }
-.daily-streak,
-.lifetime-study {
+.daily-streak {
   font-size: 1em;
   margin: 5px;
 }
 
-/* Tables for Session Log & Leaderboard */
+/* Session Log & Leaderboard */
 .session-log,
 .leaderboard-section {
   margin-top: 30px;
@@ -153,20 +127,17 @@ table {
   border-collapse: collapse;
   margin-bottom: 20px;
 }
-table,
-th,
-td {
+table, th, td {
   border: 1px solid #333;
 }
-th,
-td {
+th, td {
   padding: 10px;
   text-align: center;
 }
 
 /* Previous Day Button */
 .previous-day button {
-  background-color: #39ff14;
+  background-color: #00dfff;
   border: none;
   padding: 10px;
   border-radius: 4px;
@@ -175,10 +146,18 @@ td {
   transition: background-color 0.3s ease;
 }
 .previous-day button:hover {
-  background-color: #32e10f;
+  background-color: #00caff;
 }
 
 /* Responsive Styling */
+@media (max-width: 800px) {
+  .main-flex {
+    flex-direction: column;
+  }
+  .left-section, .right-section {
+    flex: 1 0 100%;
+  }
+}
 @media (max-width: 600px) {
   .study-timer {
     font-size: 2.5em;
