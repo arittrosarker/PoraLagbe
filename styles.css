@@ -57,6 +57,22 @@ header h1 {
   margin-top: 10px;
 }
 
+/* Delete Account button styling */
+.delete-btn {
+  padding: 8px 12px;
+  margin: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #ff4d4d;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.delete-btn:hover {
+  background-color: #e60000;
+}
+
 /* Main Flex Container */
 .main-flex {
   display: flex;
@@ -204,9 +220,10 @@ footer {
 @media (max-width: 800px) {
   .main-flex {
     flex-direction: column;
+    align-items: center;
   }
   .left-section, .right-section {
-    flex: 1 0 100%;
+    flex: 1 0 90%;
   }
 }
 @media (max-width: 600px) {
@@ -219,5 +236,9 @@ footer {
   }
   .container {
     padding: 10px;
+  }
+  /* Center all text for mobile */
+  .left-section, .right-section {
+    text-align: center;
   }
 }
