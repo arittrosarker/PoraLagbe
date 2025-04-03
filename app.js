@@ -281,38 +281,43 @@ function deleteAccount() {
       "Are you sure you want to delete your account? This will remove all your data and reset the app."
     )
   ) {
+    // Stop any active intervals
+    clearInterval(timerInterval);
+    clearInterval(firebaseUpdateInterval);
+    firebaseUpdateInterval = null;
+
     // Remove user's leaderboard entry from Firebase.
     const leaderboardRef = ref(db, "leaderboard/" + username);
     remove(leaderboardRef)
       .then(() => {
         console.log("Firebase leaderboard entry removed.");
+        // Wait briefly to ensure removal is propagated
+        setTimeout(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+
+          // Clear cookies.
+          document.cookie.split(";").forEach(function (c) {
+            document.cookie = c
+              .replace(/^ +/, "")
+              .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+          });
+
+          // Clear cache storage if available.
+          if ("caches" in window) {
+            caches.keys().then((names) => {
+              names.forEach((name) => {
+                caches.delete(name);
+              });
+            });
+          }
+
+          location.reload();
+        }, 500);
       })
       .catch((error) => {
         console.error("Error removing leaderboard entry:", error);
       });
-
-    // Clear local storage and session storage.
-    localStorage.clear();
-    sessionStorage.clear();
-
-    // Clear cookies.
-    document.cookie.split(";").forEach(function (c) {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
-    });
-
-    // Clear cache storage if available.
-    if ("caches" in window) {
-      caches.keys().then((names) => {
-        names.forEach((name) => {
-          caches.delete(name);
-        });
-      });
-    }
-
-    // Reload the page to reset the UI back to the "Set Name" state.
-    location.reload();
   }
 }
 
@@ -367,6 +372,10 @@ saveUsernameBtn.addEventListener("click", () => {
         localStorage.setItem("studyUsername", username);
         // Immediately add the username to the leaderboard with 0 seconds
         updateLeaderboard(username, 0);
+        // Set an onDisconnect handler so the node is removed when the client disconnects
+        const userRef = ref(db, "leaderboard/" + username);
+        userRef.onDisconnect().remove();
+
         userSetupDiv.style.display = "none";
         displayedUsernameEl.innerText = username;
         userDisplayDiv.style.display = "block";
