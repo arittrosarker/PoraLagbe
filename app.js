@@ -64,7 +64,6 @@ const quotes = [
   "Your future self will thank you.",
   "Stay focused and never give up!",
 ];
-
 function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   motivationalQuoteEl.innerText = quotes[randomIndex];
@@ -81,12 +80,11 @@ fetch("badword.txt")
     console.error("Error loading banned words:", error);
   });
 
-// Check if the name contains any banned word (case-insensitive substring check)
+// Check if the name contains any banned word (using whole-word matching)
 function containsBannedWord(name) {
-  const lowerNameWords = name.toLowerCase().split(/\s+/); // Split username into words
+  const lowerNameWords = name.toLowerCase().split(/\s+/); // split by whitespace
   return lowerNameWords.some((word) => bannedWords.includes(word));
 }
-
 
 // Animated clock display
 function updateClock() {
@@ -299,12 +297,9 @@ function deleteAccount() {
 
     // Clear cookies.
     document.cookie.split(";").forEach(function (c) {
-      document.cookie =
-        c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" +
-            new Date(0).toUTCString() +
-            ";path=/");
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
     });
 
     // Clear cache storage if available.
@@ -344,13 +339,11 @@ saveUsernameBtn.addEventListener("click", () => {
     alert("Please enter a valid name.");
     return;
   }
-
   // Check for banned words
   if (containsBannedWord(inputName)) {
     alert("This name is not allowed.");
     return;
   }
-
   // Lowercase comparison for duplicates in the Firebase "leaderboard" node
   const lowerInput = inputName.toLowerCase();
   const leaderboardRef = ref(db, "leaderboard");
@@ -372,6 +365,8 @@ saveUsernameBtn.addEventListener("click", () => {
       } else {
         username = inputName;
         localStorage.setItem("studyUsername", username);
+        // Immediately add the username to the leaderboard with 0 seconds
+        updateLeaderboard(username, 0);
         userSetupDiv.style.display = "none";
         displayedUsernameEl.innerText = username;
         userDisplayDiv.style.display = "block";
