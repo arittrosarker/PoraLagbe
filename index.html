@@ -1,124 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Study Timer & Leaderboard</title>
-    <!-- Google Fonts for modern styling -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css" />
-    <!-- Use module script for ES6 modules -->
+    
+    <!-- JavaScript -->
     <script type="module" src="app.js" defer></script>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <!-- Header Section -->
-      <header>
-        <h1>Study Timer & Leaderboard</h1>
-        <!-- User Setup: shown only if no name is set -->
-        <div id="userSetup">
-          <input type="text" id="usernameInput" placeholder="Enter your name" />
-          <button id="saveUsernameBtn">Save Name</button>
-        </div>
-        <!-- When the name is set, display user's name and the Delete Account button -->
-        <div id="userDisplay" style="display:none;">
-          Hello, <span id="displayedUsername"></span>
-          <button id="deleteAccountBtn" class="delete-btn">
-            Delete Account
-          </button>
-        </div>
-      </header>
-
-      <!-- Main App Content; hidden until the user sets their name -->
-      <div id="appContent" style="display:none;">
-        <main>
-          <div class="main-flex">
-            <!-- Left Section: Timer, Additional Info, Session Log -->
-            <div class="left-section">
-              <!-- Timer Section -->
-              <section class="timer-section">
-                <div class="animated-clock" id="animatedClock"></div>
-                <div class="status-indicator" id="statusIndicator">
-                  Idle
-                </div>
-                <div class="study-timer" id="studyTimer">
-                  00:00:00
-                </div>
-                <div class="timer-controls">
-                  <!-- Single toggle button for Start/Pause -->
-                  <button id="toggleTimer">Start</button>
-                </div>
-                <!-- Audio elements (ensure these files are present in your project) -->
-                <audio id="startSound" src="start.mp3"></audio>
-                <audio id="pauseSound" src="pause.mp3"></audio>
-              </section>
-
-              <!-- Additional Info -->
-              <section class="additional-info">
-                <div class="motivational-quote" id="motivationalQuote"></div>
-                <!-- Removed streak counter for now -->
-                <!--
-                <div class="daily-streak">
-                  Streak: <span id="streakCounter">0</span> days
-                </div>
-                -->
-              </section>
-
-              <!-- Session Log (local for today) -->
-              <section class="session-log">
-                <h2>Session Log</h2>
-                <p class="tip">
-                  *Only sessions longer than 5 minutes will be saved.*
-                </p>
-                <table id="sessionTable">
-                  <thead>
-                    <tr>
-                      <th>Start Time</th>
-                      <th>End Time</th>
-                      <th>Duration</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </section>
+        <!-- Header Section -->
+        <header>
+            <h1>Study Timer & Leaderboard</h1>
+            
+            <!-- User Setup: Displayed if no name is set -->
+            <div id="userSetup">
+                <input type="text" id="usernameInput" placeholder="Enter your name" />
+                <button id="saveUsernameBtn">Save Name</button>
             </div>
-
-            <!-- Right Section: Leaderboard -->
-            <div class="right-section">
-              <section class="leaderboard-section">
-                <h2>Leaderboard</h2>
-                <table id="leaderboardTable">
-                  <thead>
-                    <tr>
-                      <th>Rank</th>
-                      <th>User</th>
-                      <th>Study Time</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-                <!-- Removed Previous Day's Data button for now -->
-                <!--
-                <div class="previous-day">
-                  <button id="prevDayBtn">
-                    View Previous Day's Data
-                  </button>
-                  <div id="prevDayData"></div>
-                </div>
-                -->
-              </section>
+            
+            <!-- Displayed when the name is set -->
+            <div id="userDisplay" style="display:none;">
+                Hello, <span id="displayedUsername"></span>
+                <button id="deleteAccountBtn" class="delete-btn">Delete Account</button>
             </div>
-          </div>
-        </main>
-      </div>
-
-      <!-- Footer/Credits -->
-      <footer>
-        <p>Created by Arittro Sarker Bandhan</p>
-      </footer>
+        </header>
+        
+        <!-- Main App Content (Hidden Until User Sets Name) -->
+        <div id="appContent" style="display:none;">
+            <main>
+                <div class="main-flex">
+                    
+                    <!-- Left Section: Timer, Info, Session Log -->
+                    <div class="left-section">
+                        
+                        <!-- Timer Section -->
+                        <section class="timer-section">
+                            <div class="animated-clock" id="animatedClock"></div>
+                            <div class="status-indicator" id="statusIndicator">Idle</div>
+                            <div class="study-timer" id="studyTimer">00:00:00</div>
+                            <div class="timer-controls">
+                                <button id="toggleTimer">Start</button>
+                            </div>
+                            
+                            <!-- Audio Elements -->
+                            <audio id="startSound" src="start.mp3"></audio>
+                            <audio id="pauseSound" src="pause.mp3"></audio>
+                        </section>
+                        
+                        <!-- Additional Info -->
+                        <section class="additional-info">
+                            <div class="motivational-quote" id="motivationalQuote"></div>
+                            <div class="daily-streak">Streak: <span id="streakCounter">0</span> days</div>
+                        </section>
+                        
+                        <!-- Session Log -->
+                        <section class="session-log">
+                            <h2>Session Log</h2>
+                            <p class="tip">*Only sessions longer than 5 minutes will be saved.*</p>
+                            <table id="sessionTable">
+                                <thead>
+                                    <tr>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </section>
+                    </div>
+                    
+                    <!-- Right Section: Leaderboard -->
+                    <div class="right-section">
+                        <section class="leaderboard-section">
+                            <h2>Leaderboard</h2>
+                            <table id="leaderboardTable">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>User</th>
+                                        <th>Study Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            
+                            <!-- Previous Day Data -->
+                            <div class="previous-day">
+                                <button id="prevDayBtn">View Previous Day's Data</button>
+                                <div id="prevDayData"></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Footer -->
+        <footer>
+            <p>Created by Arittro Sarker Bandhan</p>
+        </footer>
     </div>
-  </body>
+</body>
 </html>
