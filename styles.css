@@ -1,276 +1,244 @@
-/* Import Google Font */
+/* Import Roboto for modern styling */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-/* Global Styles */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-    color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+  color: #e0e0e0;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: rgba(10, 10, 10, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 0 30px rgba(0, 223, 255, 0.3);
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: rgba(10, 10, 10, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 223, 255, 0.3);
 }
 
-/* Header */
+/* Header styling */
 header {
-    text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #003f63;
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #003f63;
 }
-
 header h1 {
-    color: #00dfff;
-    margin: 0;
+  color: #00dfff;
+  margin: 0;
 }
-
-/* User Setup */
-#userSetup input, #userSetup button {
-    padding: 10px 12px;
-    margin: 8px;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    outline: none;
-}
-
-#userSetup input {
-    background-color: #0f0f0f;
-    color: #e0e0e0;
-}
-
+#userSetup input,
 #userSetup button {
-    background-color: #00dfff;
-    color: #121212;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  padding: 10px 12px;
+  margin: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  outline: none;
 }
-
+#userSetup input {
+  background-color: #0f0f0f;
+  color: #e0e0e0;
+}
+#userSetup button {
+  background-color: #00dfff;
+  color: #121212;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 #userSetup button:hover {
-    background-color: #00caff;
+  background-color: #00caff;
 }
-
 #userDisplay {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
-/* Delete Account Button */
+/* Delete Account button styling */
 .delete-btn {
-    padding: 8px 12px;
-    margin: 8px;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    background-color: #ff4d4d;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  padding: 8px 12px;
+  margin: 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #ff4d4d;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-
 .delete-btn:hover {
-    background-color: #e60000;
+  background-color: #e60000;
 }
 
-/* Layout */
+/* Main Flex Container */
 .main-flex {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
 }
-
 .left-section {
-    flex: 0 0 70%;
+  flex: 0 0 70%;
 }
-
 .right-section {
-    flex: 0 0 30%;
+  flex: 0 0 30%;
 }
 
 /* Timer Section */
 .timer-section {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 30px;
 }
-
 .animated-clock {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #00dfff;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #00dfff;
 }
-
 .status-indicator {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
-
 .study-timer {
-    font-size: 4rem;
-    font-weight: bold;
-    margin: 20px 0;
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 20px 0;
 }
-
 .timer-controls button {
-    padding: 12px 24px;
-    margin: 8px;
-    background-color: #00dfff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #121212;
-    font-weight: bold;
-    transition: transform 0.2s, background-color 0.3s ease;
+  padding: 12px 24px;
+  margin: 8px;
+  background-color: #00dfff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #121212;
+  font-weight: bold;
+  transition: transform 0.2s, background-color 0.3s ease;
 }
-
 .timer-controls button:hover {
-    transform: scale(1.05);
-    background-color: #00caff;
+  transform: scale(1.05);
+  background-color: #00caff;
 }
 
 /* Additional Info */
 .additional-info {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin-bottom: 30px;
 }
-
 .motivational-quote {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    color: #00dfff;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #00dfff;
 }
-
 .daily-streak {
-    font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 /* Session Log */
 .session-log {
-    margin-top: 30px;
+  margin-top: 30px;
 }
-
 .session-log h2 {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
-
 .session-log .tip {
-    font-size: 0.9rem;
-    color: #aaa;
-    text-align: center;
-    margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #aaa;
+  text-align: center;
+  margin-bottom: 10px;
 }
-
-/* Tables */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
-
 table, th, td {
-    border: 1px solid #003f63;
+  border: 1px solid #003f63;
 }
-
 th, td {
-    padding: 10px;
-    text-align: center;
+  padding: 10px;
+  text-align: center;
 }
-
 th {
-    background-color: #00dfff;
-    color: #121212;
+  background-color: #00dfff;
+  color: #121212;
 }
 
-/* Leaderboard */
+/* Leaderboard Table */
 .leaderboard-section h2 {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
-
-.leaderboard-section table th, .leaderboard-section table td {
-    border-color: #003f63;
+.leaderboard-section table th,
+.leaderboard-section table td {
+  border-color: #003f63;
 }
-
 .leaderboard-section table th {
-    background-color: #00dfff;
-    color: #121212;
+  background-color: #00dfff;
+  color: #121212;
 }
 
-/* Leaderboard Ranks */
+/* Special Styling for Top 3 Ranks in Leaderboard */
 tr.first {
-    background-color: #ffd700 !important; /* Gold */
-    color: #121212;
+  background-color: #ffd700 !important; /* Gold */
+  color: #121212;
 }
-
 tr.second {
-    background-color: #c0c0c0 !important; /* Silver */
-    color: #121212;
+  background-color: #c0c0c0 !important; /* Silver */
+  color: #121212;
 }
-
 tr.third {
-    background-color: #cd7f32 !important; /* Bronze */
-    color: #121212;
+  background-color: #cd7f32 !important; /* Bronze */
+  color: #121212;
 }
 
 /* Previous Day Button */
 .previous-day button {
-    background-color: #00dfff;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    color: #121212;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #00dfff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  color: #121212;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-
 .previous-day button:hover {
-    background-color: #00caff;
+  background-color: #00caff;
 }
 
-/* Footer */
+/* Footer/Credits */
 footer {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 10px;
-    border-top: 2px solid #003f63;
-    font-size: 0.9rem;
-    color: #00dfff;
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 10px;
+  border-top: 2px solid #003f63;
+  font-size: 0.9rem;
+  color: #00dfff;
 }
 
-/* Responsive Design */
+/* Responsive Styling */
 @media (max-width: 800px) {
-    .main-flex {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .left-section, .right-section {
-        flex: 1 0 90%;
-    }
+  .main-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+  .left-section, .right-section {
+    flex: 1 0 90%;
+  }
 }
-
 @media (max-width: 600px) {
-    .study-timer {
-        font-size: 2.5rem;
-    }
-
-    .timer-controls button {
-        width: 100%;
-        margin: 5px 0;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .left-section, .right-section {
-        text-align: center;
-    }
+  .study-timer {
+    font-size: 2.5rem;
+  }
+  .timer-controls button {
+    width: 100%;
+    margin: 5px 0;
+  }
+  .container {
+    padding: 10px;
+  }
+  /* Center all text for mobile */
+  .left-section, .right-section {
+    text-align: center;
+  }
 }

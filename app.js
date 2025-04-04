@@ -42,15 +42,14 @@ const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 const userSetupDiv = document.getElementById("userSetup");
 const userDisplayDiv = document.getElementById("userDisplay");
 const displayedUsernameEl = document.getElementById("displayedUsername");
-// Removed streakCounterEl since streak is removed
 const statusIndicator = document.getElementById("statusIndicator");
 const motivationalQuoteEl = document.getElementById("motivationalQuote");
+const streakCounterEl = document.getElementById("streakCounter");
 const sessionTableBody = document.querySelector("#sessionTable tbody");
 const leaderboardTableBody = document.querySelector("#leaderboardTable tbody");
 const animatedClockEl = document.getElementById("animatedClock");
-// Removed previous day elements since not needed
-// const prevDayBtn = document.getElementById("prevDayBtn");
-// const prevDayDataEl = document.getElementById("prevDayData");
+const prevDayBtn = document.getElementById("prevDayBtn");
+const prevDayDataEl = document.getElementById("prevDayData");
 const appContent = document.getElementById("appContent");
 
 // Audio Elements (ensure these assets exist)
@@ -65,12 +64,14 @@ const quotes = [
   "Your future self will thank you.",
   "Stay focused and never give up!",
 ];
+
 function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   motivationalQuoteEl.innerText = quotes[randomIndex];
 }
 
 // Load banned words from "badword.txt"
+// Ensure that badword.txt is placed in the same directory as this file.
 fetch("badword.txt")
   .then((response) => response.text())
   .then((text) => {
@@ -80,11 +81,12 @@ fetch("badword.txt")
     console.error("Error loading banned words:", error);
   });
 
-// Check if the name contains any banned word (using whole-word matching)
+// Check if the name contains any banned word (case-insensitive substring check)
 function containsBannedWord(name) {
-  const lowerNameWords = name.toLowerCase().split(/\s+/);
+  const lowerNameWords = name.toLowerCase().split(/\s+/); // Split username into words
   return lowerNameWords.some((word) => bannedWords.includes(word));
 }
+
 
 // Animated clock display
 function updateClock() {
@@ -140,6 +142,7 @@ function loadLocalSessionLog() {
   const key = getSessionKey();
   sessionTableBody.innerHTML = "";
   let sessions = JSON.parse(localStorage.getItem(key)) || [];
+  // Filter out sessions shorter than 5 minutes.
   sessions = sessions.filter((session) => session.duration >= 300);
   localStorage.setItem(key, JSON.stringify(sessions));
   sessions.forEach((session) => {
@@ -151,38 +154,30 @@ function loadLocalSessionLog() {
   });
 }
 
-// Reset leaderboard in Firebase: Set totalSec to 0 for all users.
-function resetLeaderboard() {
-  const leaderboardRef = ref(db, "leaderboard");
-  get(leaderboardRef)
-    .then((snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        for (const user in data) {
-          const userRef = ref(db, "leaderboard/" + user);
-          set(userRef, { totalSec: 0 });
-        }
-      }
-    })
-    .catch((error) => {
-      console.error("Error resetting leaderboard:", error);
-    });
-}
-
-// Check for new day; reset local data and leaderboard if needed.
+// Check for new day; reset local data if so.
 function checkDailyReset() {
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem("studyDate");
   if (storedDate !== todayStr) {
-    resetLeaderboard();
+    savePreviousDayData(storedDate);
     elapsedTime = 0;
     localStorage.setItem("studyDate", todayStr);
     localStorage.removeItem("hasStudiedToday");
+    localStorage.setItem("streak", 0);
+    streakCounterEl.innerText = 0;
     localStorage.removeItem(getSessionKey());
     updateTimerDisplay();
     updateStatus("Idle");
     loadLocalSessionLog();
   }
+}
+
+// Save previous day's leaderboard data (stub)
+function savePreviousDayData(dateStr) {
+  if (!dateStr) return;
+  const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
+  const leaderboardData = { message: "Leaderboard data for " + dateStr };
+  set(leaderboardRef, leaderboardData);
 }
 
 // Timer Functions
@@ -224,7 +219,7 @@ function pauseTimer() {
     currentSession.duration = elapsedTime;
     addLocalSessionLog(currentSession);
     updateLeaderboard(username, elapsedTime);
-    // Removed streak increase since streak feature is removed
+    increaseStreak();
     currentSession = null;
   }
 }
@@ -240,19 +235,14 @@ function updateLeaderboard(user, timeSec) {
   set(leaderboardRef, { totalSec: timeSec });
 }
 
-// Load realtime leaderboard from Firebase.
-// Only include users with totalSec > 0 so that users with 0 seconds are hidden.
+// Load realtime leaderboard from Firebase and update the table.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
     const data = snapshot.val();
     const arr = [];
-    if (data) {
-      for (let user in data) {
-        if (data[user].totalSec > 0) {
-          arr.push({ user: user, totalSec: data[user].totalSec });
-        }
-      }
+    for (let user in data) {
+      arr.push({ user: user, totalSec: data[user].totalSec });
     }
     arr.sort((a, b) => b.totalSec - a.totalSec);
     leaderboardTableBody.innerHTML = "";
@@ -269,52 +259,71 @@ function loadLeaderboard() {
   });
 }
 
-// Delete Account function – clears Firebase data (leaderboard) and local storage without requiring a refresh.
+// Load streak from localStorage.
+function loadStreak() {
+  let streak = localStorage.getItem("streak") || 0;
+  streakCounterEl.innerText = streak;
+}
+
+// Increase the streak only once per day.
+function increaseStreak() {
+  if (!localStorage.getItem("hasStudiedToday")) {
+    let streak = parseInt(localStorage.getItem("streak")) || 0;
+    streak++;
+    localStorage.setItem("streak", streak);
+    streakCounterEl.innerText = streak;
+    localStorage.setItem("hasStudiedToday", "true");
+  }
+}
+
+// Delete Account function – clears Firebase data (leaderboard), local storage, cookies, caches, and resets UI.
 function deleteAccount() {
   if (
     confirm(
-      "Are you sure you want to delete your account? This will remove your data and reset the app."
+      "Are you sure you want to delete your account? This will remove all your data and reset the app."
     )
   ) {
-    // Stop active intervals
-    clearInterval(timerInterval);
-    clearInterval(firebaseUpdateInterval);
-    firebaseUpdateInterval = null;
     // Remove user's leaderboard entry from Firebase.
     const leaderboardRef = ref(db, "leaderboard/" + username);
     remove(leaderboardRef)
       .then(() => {
         console.log("Firebase leaderboard entry removed.");
-        // Clear local and session storage, cookies, and caches
-        localStorage.clear();
-        sessionStorage.clear();
-        document.cookie.split(";").forEach(function (c) {
-          document.cookie =
-            c.replace(/^ +/, "").replace(/=.*/, "=;expires=" +
-            new Date(0).toUTCString() +
-            ";path=/");
-        });
-        if ("caches" in window) {
-          caches.keys().then((names) => {
-            names.forEach((name) => {
-              caches.delete(name);
-            });
-          });
-        }
-        // Update the UI:
-        username = "";
-        userSetupDiv.style.display = "block";
-        userDisplayDiv.style.display = "none";
-        appContent.style.display = "none";
       })
       .catch((error) => {
         console.error("Error removing leaderboard entry:", error);
       });
+
+    // Clear local storage and session storage.
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Clear cookies.
+    document.cookie.split(";").forEach(function (c) {
+      document.cookie =
+        c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" +
+            new Date(0).toUTCString() +
+            ";path=/");
+    });
+
+    // Clear cache storage if available.
+    if ("caches" in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          caches.delete(name);
+        });
+      });
+    }
+
+    // Reload the page to reset the UI back to the "Set Name" state.
+    location.reload();
   }
 }
 
 // === Event Listeners ===
 
+// Toggle Timer Start/Pause
 toggleTimerBtn.addEventListener("click", () => {
   if (!username) {
     alert("Please set your name first.");
@@ -328,16 +337,21 @@ toggleTimerBtn.addEventListener("click", () => {
   }
 });
 
+// Save Username with duplicate and banned word checks
 saveUsernameBtn.addEventListener("click", () => {
   const inputName = usernameInput.value.trim();
   if (!inputName) {
     alert("Please enter a valid name.");
     return;
   }
+
+  // Check for banned words
   if (containsBannedWord(inputName)) {
     alert("This name is not allowed.");
     return;
   }
+
+  // Lowercase comparison for duplicates in the Firebase "leaderboard" node
   const lowerInput = inputName.toLowerCase();
   const leaderboardRef = ref(db, "leaderboard");
   get(leaderboardRef)
@@ -358,15 +372,13 @@ saveUsernameBtn.addEventListener("click", () => {
       } else {
         username = inputName;
         localStorage.setItem("studyUsername", username);
-        // Immediately add the username to the leaderboard with 0 seconds.
-        updateLeaderboard(username, 0);
         userSetupDiv.style.display = "none";
         displayedUsernameEl.innerText = username;
         userDisplayDiv.style.display = "block";
         appContent.style.display = "block";
         loadLocalSessionLog();
         loadLeaderboard();
-        // Removed loadStreak() since streak feature is removed
+        loadStreak();
       }
     })
     .catch((error) => {
@@ -378,8 +390,6 @@ if (deleteAccountBtn) {
   deleteAccountBtn.addEventListener("click", deleteAccount);
 }
 
-// Removed Previous Day's Data event listener as it's no longer needed.
-/*
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -398,7 +408,6 @@ prevDayBtn.addEventListener("click", () => {
     { onlyOnce: true }
   );
 });
-*/
 
 window.addEventListener("load", () => {
   const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
@@ -415,6 +424,7 @@ window.addEventListener("load", () => {
   checkDailyReset();
   loadLeaderboard();
   loadLocalSessionLog();
+  loadStreak();
   displayRandomQuote();
   if (username) {
     userSetupDiv.style.display = "none";
