@@ -42,14 +42,16 @@ const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 const userSetupDiv = document.getElementById("userSetup");
 const userDisplayDiv = document.getElementById("userDisplay");
 const displayedUsernameEl = document.getElementById("displayedUsername");
+// Removed streakCounterEl since streak is removed
 const statusIndicator = document.getElementById("statusIndicator");
 const motivationalQuoteEl = document.getElementById("motivationalQuote");
 const sessionTableBody = document.querySelector("#sessionTable tbody");
 const leaderboardTableBody = document.querySelector("#leaderboardTable tbody");
 const animatedClockEl = document.getElementById("animatedClock");
+// Removed previous day elements since not needed
+// const prevDayBtn = document.getElementById("prevDayBtn");
+// const prevDayDataEl = document.getElementById("prevDayData");
 const appContent = document.getElementById("appContent");
-// Theme selector element
-const themeSelect = document.getElementById("themeSelect");
 
 // Audio Elements (ensure these assets exist)
 const startSound = document.getElementById("startSound");
@@ -82,22 +84,6 @@ fetch("badword.txt")
 function containsBannedWord(name) {
   const lowerNameWords = name.toLowerCase().split(/\s+/);
   return lowerNameWords.some((word) => bannedWords.includes(word));
-}
-
-// Apply the saved theme (or default to neon)
-if (localStorage.getItem("selectedTheme") === "cozy") {
-  document.body.classList.add("cozy-theme");
-} else {
-  document.body.classList.remove("cozy-theme");
-}
-
-// Set up theme selector drop-down
-if (themeSelect) {
-  themeSelect.value = localStorage.getItem("selectedTheme") || "neon";
-  themeSelect.addEventListener("change", () => {
-    localStorage.setItem("selectedTheme", themeSelect.value);
-    location.reload(); // refresh the page to apply new theme
-  });
 }
 
 // Animated clock display
@@ -238,6 +224,7 @@ function pauseTimer() {
     currentSession.duration = elapsedTime;
     addLocalSessionLog(currentSession);
     updateLeaderboard(username, elapsedTime);
+    // Removed streak increase since streak feature is removed
     currentSession = null;
   }
 }
@@ -379,6 +366,7 @@ saveUsernameBtn.addEventListener("click", () => {
         appContent.style.display = "block";
         loadLocalSessionLog();
         loadLeaderboard();
+        // Removed loadStreak() since streak feature is removed
       }
     })
     .catch((error) => {
@@ -389,6 +377,28 @@ saveUsernameBtn.addEventListener("click", () => {
 if (deleteAccountBtn) {
   deleteAccountBtn.addEventListener("click", deleteAccount);
 }
+
+// Removed Previous Day's Data event listener as it's no longer needed.
+/*
+prevDayBtn.addEventListener("click", () => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const dateKey = yesterday.toDateString();
+  const historyRef = ref(db, "history/" + dateKey + "/leaderboard");
+  onValue(
+    historyRef,
+    (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        prevDayDataEl.innerText = JSON.stringify(data);
+      } else {
+        prevDayDataEl.innerText = "No data for " + dateKey;
+      }
+    },
+    { onlyOnce: true }
+  );
+});
+*/
 
 window.addEventListener("load", () => {
   const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
