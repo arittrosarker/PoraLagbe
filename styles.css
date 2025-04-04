@@ -131,9 +131,6 @@ header h1 {
   margin-bottom: 10px;
   color: #00dfff;
 }
-.daily-streak {
-  font-size: 1.1rem;
-}
 
 /* Session Log */
 .session-log {
@@ -193,20 +190,6 @@ tr.second {
 tr.third {
   background-color: #cd7f32 !important; /* Bronze */
   color: #121212;
-}
-
-/* Previous Day Button */
-.previous-day button {
-  background-color: #00dfff;
-  border: none;
-  padding: 10px;
-  border-radius: 4px;
-  color: #121212;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.previous-day button:hover {
-  background-color: #00caff;
 }
 
 /* Footer/Credits */
