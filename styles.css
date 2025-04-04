@@ -1,21 +1,52 @@
-/* Import Roboto for modern styling */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+/* CSS Variables for Neon Theme (default) */
+:root {
+  --bg-gradient-start: #0a0a0a;
+  --bg-gradient-end: #1a1a1a;
+  --container-bg: rgba(10, 10, 10, 0.9);
+  --container-shadow: rgba(0, 223, 255, 0.3);
+  --header-border-color: #003f63;
+  --header-text-color: #00dfff;
+  --input-bg: #0f0f0f;
+  --input-text: #e0e0e0;
+  --btn-bg: #00dfff;
+  --btn-text: #121212;
+  --btn-hover-bg: #00caff;
+  --accent-color: #00dfff;
+  --text-color: #e0e0e0;
+}
+
+/* Cozy theme overrides */
+.cozy-theme {
+  --bg-gradient-start: #fdfbfb; 
+  --bg-gradient-end: #ebedee;
+  --container-bg: rgba(255, 255, 255, 0.95);
+  --container-shadow: rgba(0, 0, 0, 0.1);
+  --header-border-color: #c7d2fe;
+  --header-text-color: #6b7280;
+  --input-bg: #f3f4f6;
+  --input-text: #4b5563;
+  --btn-bg: #93c5fd;
+  --btn-text: #1e3a8a;
+  --btn-hover-bg: #60a5fa;
+  --accent-color: #6366f1;
+  --text-color: #374151;
+}
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
-  color: #e0e0e0;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text-color);
 }
 
 .container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
-  background-color: rgba(10, 10, 10, 0.9);
+  background-color: var(--container-bg);
   border-radius: 8px;
-  box-shadow: 0 0 30px rgba(0, 223, 255, 0.3);
+  box-shadow: 0 0 30px var(--container-shadow);
 }
 
 /* Header styling */
@@ -23,12 +54,32 @@ header {
   text-align: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #003f63;
+  border-bottom: 2px solid var(--header-border-color);
 }
 header h1 {
-  color: #00dfff;
+  color: var(--header-text-color);
   margin: 0;
 }
+
+/* Theme Selector */
+.theme-selector {
+  margin: 10px 0;
+  display: inline-block;
+}
+.theme-selector label {
+  font-size: 1rem;
+  margin-right: 5px;
+  color: var(--text-color);
+}
+.theme-selector select {
+  padding: 5px 8px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--header-border-color);
+  background-color: var(--input-bg);
+  color: var(--input-text);
+}
+
 #userSetup input,
 #userSetup button {
   padding: 10px 12px;
@@ -39,17 +90,17 @@ header h1 {
   outline: none;
 }
 #userSetup input {
-  background-color: #0f0f0f;
-  color: #e0e0e0;
+  background-color: var(--input-bg);
+  color: var(--input-text);
 }
 #userSetup button {
-  background-color: #00dfff;
-  color: #121212;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 #userSetup button:hover {
-  background-color: #00caff;
+  background-color: var(--btn-hover-bg);
 }
 #userDisplay {
   font-size: 1.2rem;
@@ -94,7 +145,7 @@ header h1 {
 .animated-clock {
   font-size: 1.5rem;
   margin-bottom: 10px;
-  color: #00dfff;
+  color: var(--accent-color);
 }
 .status-indicator {
   font-size: 1.2rem;
@@ -108,17 +159,17 @@ header h1 {
 .timer-controls button {
   padding: 12px 24px;
   margin: 8px;
-  background-color: #00dfff;
+  background-color: var(--btn-bg);
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  color: #121212;
+  color: var(--btn-text);
   font-weight: bold;
   transition: transform 0.2s, background-color 0.3s ease;
 }
 .timer-controls button:hover {
   transform: scale(1.05);
-  background-color: #00caff;
+  background-color: var(--btn-hover-bg);
 }
 
 /* Additional Info */
@@ -129,7 +180,7 @@ header h1 {
 .motivational-quote {
   font-size: 1.3rem;
   margin-bottom: 10px;
-  color: #00dfff;
+  color: var(--accent-color);
 }
 
 /* Session Log */
@@ -153,7 +204,7 @@ table {
 table,
 th,
 td {
-  border: 1px solid #003f63;
+  border: 1px solid var(--header-border-color);
 }
 th,
 td {
@@ -161,8 +212,8 @@ td {
   text-align: center;
 }
 th {
-  background-color: #00dfff;
-  color: #121212;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
 }
 
 /* Leaderboard Table */
@@ -171,11 +222,11 @@ th {
 }
 .leaderboard-section table th,
 .leaderboard-section table td {
-  border-color: #003f63;
+  border-color: var(--header-border-color);
 }
 .leaderboard-section table th {
-  background-color: #00dfff;
-  color: #121212;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
 }
 
 /* Special Styling for Top 3 Ranks in Leaderboard */
@@ -197,9 +248,9 @@ footer {
   text-align: center;
   margin-top: 40px;
   padding-top: 10px;
-  border-top: 2px solid #003f63;
+  border-top: 2px solid var(--header-border-color);
   font-size: 0.9rem;
-  color: #00dfff;
+  color: var(--header-text-color);
 }
 
 /* Responsive Styling */
