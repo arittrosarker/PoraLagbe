@@ -42,14 +42,15 @@ const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 const userSetupDiv = document.getElementById("userSetup");
 const userDisplayDiv = document.getElementById("userDisplay");
 const displayedUsernameEl = document.getElementById("displayedUsername");
+// Removed streakCounterEl since streak is removed
 const statusIndicator = document.getElementById("statusIndicator");
 const motivationalQuoteEl = document.getElementById("motivationalQuote");
-const streakCounterEl = document.getElementById("streakCounter");
 const sessionTableBody = document.querySelector("#sessionTable tbody");
 const leaderboardTableBody = document.querySelector("#leaderboardTable tbody");
 const animatedClockEl = document.getElementById("animatedClock");
-const prevDayBtn = document.getElementById("prevDayBtn");
-const prevDayDataEl = document.getElementById("prevDayData");
+// Removed previous day elements since not needed
+// const prevDayBtn = document.getElementById("prevDayBtn");
+// const prevDayDataEl = document.getElementById("prevDayData");
 const appContent = document.getElementById("appContent");
 
 // Audio Elements (ensure these assets exist)
@@ -70,7 +71,6 @@ function displayRandomQuote() {
 }
 
 // Load banned words from "badword.txt"
-// Ensure that badword.txt is placed in the same directory as this file.
 fetch("badword.txt")
   .then((response) => response.text())
   .then((text) => {
@@ -151,30 +151,38 @@ function loadLocalSessionLog() {
   });
 }
 
-// Check for new day; reset local data if needed.
+// Reset leaderboard in Firebase: Set totalSec to 0 for all users.
+function resetLeaderboard() {
+  const leaderboardRef = ref(db, "leaderboard");
+  get(leaderboardRef)
+    .then((snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        for (const user in data) {
+          const userRef = ref(db, "leaderboard/" + user);
+          set(userRef, { totalSec: 0 });
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("Error resetting leaderboard:", error);
+    });
+}
+
+// Check for new day; reset local data and leaderboard if needed.
 function checkDailyReset() {
   const todayStr = new Date().toDateString();
   const storedDate = localStorage.getItem("studyDate");
   if (storedDate !== todayStr) {
-    savePreviousDayData(storedDate);
+    resetLeaderboard();
     elapsedTime = 0;
     localStorage.setItem("studyDate", todayStr);
     localStorage.removeItem("hasStudiedToday");
-    localStorage.setItem("streak", 0);
-    streakCounterEl.innerText = 0;
     localStorage.removeItem(getSessionKey());
     updateTimerDisplay();
     updateStatus("Idle");
     loadLocalSessionLog();
   }
-}
-
-// Save previous day's leaderboard data (stub)
-function savePreviousDayData(dateStr) {
-  if (!dateStr) return;
-  const leaderboardRef = ref(db, "history/" + dateStr + "/leaderboard");
-  const leaderboardData = { message: "Leaderboard data for " + dateStr };
-  set(leaderboardRef, leaderboardData);
 }
 
 // Timer Functions
@@ -216,7 +224,7 @@ function pauseTimer() {
     currentSession.duration = elapsedTime;
     addLocalSessionLog(currentSession);
     updateLeaderboard(username, elapsedTime);
-    increaseStreak();
+    // Removed streak increase since streak feature is removed
     currentSession = null;
   }
 }
@@ -256,23 +264,6 @@ function loadLeaderboard() {
   });
 }
 
-// Load streak from localStorage.
-function loadStreak() {
-  let streak = localStorage.getItem("streak") || 0;
-  streakCounterEl.innerText = streak;
-}
-
-// Increase the streak only once per day.
-function increaseStreak() {
-  if (!localStorage.getItem("hasStudiedToday")) {
-    let streak = parseInt(localStorage.getItem("streak")) || 0;
-    streak++;
-    localStorage.setItem("streak", streak);
-    streakCounterEl.innerText = streak;
-    localStorage.setItem("hasStudiedToday", "true");
-  }
-}
-
 // Delete Account function – clears Firebase data (leaderboard) and local storage without requiring a refresh.
 function deleteAccount() {
   if (
@@ -294,7 +285,9 @@ function deleteAccount() {
         sessionStorage.clear();
         document.cookie.split(";").forEach(function (c) {
           document.cookie =
-            c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+            c.replace(/^ +/, "").replace(/=.*/, "=;expires=" +
+            new Date(0).toUTCString() +
+            ";path=/");
         });
         if ("caches" in window) {
           caches.keys().then((names) => {
@@ -303,7 +296,7 @@ function deleteAccount() {
             });
           });
         }
-        // Instead of reloading the page, simply update the UI:
+        // Update the UI:
         username = "";
         userSetupDiv.style.display = "block";
         userDisplayDiv.style.display = "none";
@@ -362,15 +355,13 @@ saveUsernameBtn.addEventListener("click", () => {
         localStorage.setItem("studyUsername", username);
         // Immediately add the username to the leaderboard with 0 seconds.
         updateLeaderboard(username, 0);
-        // Remove the onDisconnect handler to avoid forcing a refresh.
-        // (Previously: userRef.onDisconnect().remove(); was removed.)
         userSetupDiv.style.display = "none";
         displayedUsernameEl.innerText = username;
         userDisplayDiv.style.display = "block";
         appContent.style.display = "block";
         loadLocalSessionLog();
         loadLeaderboard();
-        loadStreak();
+        // Removed loadStreak() since streak feature is removed
       }
     })
     .catch((error) => {
@@ -382,6 +373,8 @@ if (deleteAccountBtn) {
   deleteAccountBtn.addEventListener("click", deleteAccount);
 }
 
+// Removed Previous Day's Data event listener as it's no longer needed.
+/*
 prevDayBtn.addEventListener("click", () => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -400,6 +393,7 @@ prevDayBtn.addEventListener("click", () => {
     { onlyOnce: true }
   );
 });
+*/
 
 window.addEventListener("load", () => {
   const storedElapsed = parseInt(localStorage.getItem("elapsedTime"));
@@ -416,7 +410,6 @@ window.addEventListener("load", () => {
   checkDailyReset();
   loadLeaderboard();
   loadLocalSessionLog();
-  loadStreak();
   displayRandomQuote();
   if (username) {
     userSetupDiv.style.display = "none";
