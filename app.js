@@ -241,13 +241,18 @@ function updateLeaderboard(user, timeSec) {
 }
 
 // Load realtime leaderboard from Firebase.
+// Only include users with totalSec > 0 so that users with 0 seconds are hidden.
 function loadLeaderboard() {
   const leaderboardRoot = ref(db, "leaderboard");
   onValue(leaderboardRoot, (snapshot) => {
     const data = snapshot.val();
     const arr = [];
-    for (let user in data) {
-      arr.push({ user: user, totalSec: data[user].totalSec });
+    if (data) {
+      for (let user in data) {
+        if (data[user].totalSec > 0) {
+          arr.push({ user: user, totalSec: data[user].totalSec });
+        }
+      }
     }
     arr.sort((a, b) => b.totalSec - a.totalSec);
     leaderboardTableBody.innerHTML = "";
