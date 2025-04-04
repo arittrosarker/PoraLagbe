@@ -18,6 +18,14 @@
       <!-- Header Section -->
       <header>
         <h1>Study Timer & Leaderboard</h1>
+        <!-- Theme Selector -->
+        <div class="theme-selector">
+          <label for="themeSelect">Select Theme:</label>
+          <select id="themeSelect">
+            <option value="neon">Neon</option>
+            <option value="cozy">Cozy</option>
+          </select>
+        </div>
         <!-- User Setup: shown only if no name is set -->
         <div id="userSetup">
           <input type="text" id="usernameInput" placeholder="Enter your name" />
@@ -59,12 +67,6 @@
               <!-- Additional Info -->
               <section class="additional-info">
                 <div class="motivational-quote" id="motivationalQuote"></div>
-                <!-- Removed streak counter for now -->
-                <!--
-                <div class="daily-streak">
-                  Streak: <span id="streakCounter">0</span> days
-                </div>
-                -->
               </section>
 
               <!-- Session Log (local for today) -->
@@ -100,15 +102,6 @@
                   </thead>
                   <tbody></tbody>
                 </table>
-                <!-- Removed Previous Day's Data button for now -->
-                <!--
-                <div class="previous-day">
-                  <button id="prevDayBtn">
-                    View Previous Day's Data
-                  </button>
-                  <div id="prevDayData"></div>
-                </div>
-                -->
               </section>
             </div>
           </div>
